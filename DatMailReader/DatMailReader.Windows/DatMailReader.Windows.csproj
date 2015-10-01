@@ -103,23 +103,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Common\DatParserProvider.cs" />
-    <Compile Include="Common\NavigationHelper.cs" />
-    <Compile Include="Common\ObjectSerializer.cs" />
-    <Compile Include="Common\ObservableDictionary.cs" />
-    <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\Commands\ItemClickCommand.cs" />
-    <Compile Include="ViewModel\Commands\OpenMenuFlyoutAction.cs" />
-    <Compile Include="ViewModel\Commands\HTMLToText.cs" />
-    <Compile Include="ViewModel\DetailViewModel.cs" />
-    <Compile Include="ViewModel\LastExtractedFilesProvider.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\RecentFilesProvider.cs" />
-    <Compile Include="ViewModel\Commands\RightTapItemClick.cs" />
-    <Compile Include="ViewModel\Commands\RtfText.cs" />
-    <Compile Include="ViewModel\ThumbnailToImageConverter.cs" />
-    <Compile Include="ViewModel\ViewModelLocator.cs" />
+    <Compile Include="ViewModelLocator\ViewModelLocatorWin.cs" />
     <Compile Include="View\OpenedFilePage.xaml.cs">
       <DependentUpon>OpenedFilePage.xaml</DependentUpon>
     </Compile>
@@ -180,6 +165,24 @@
     <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
       <Name>Behaviors SDK %28XAML%29</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Helpers\DatMailReader.Helpers.csproj">
+      <Project>{5c343be3-5d50-4af4-900a-c77bdc40fd87}</Project>
+      <Name>DatMailReader.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Models\DatMailReader.Models.csproj">
+      <Project>{beecc68c-433f-42c5-a40b-6fbaa1cb1f01}</Project>
+      <Name>DatMailReader.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Resources\DatMailReader.Resources.csproj">
+      <Project>{90707194-b980-468e-a51f-cbfb47b8cdd1}</Project>
+      <Name>DatMailReader.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ViewModels\DatMailReader.ViewModels.csproj">
+      <Project>{d65d463f-3409-449d-932c-cbd8d4ce8b7d}</Project>
+      <Name>DatMailReader.ViewModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

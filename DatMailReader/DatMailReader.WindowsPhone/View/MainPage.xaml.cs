@@ -1,4 +1,5 @@
-﻿using DatMailReader.ViewModel;
+﻿using DatMailReader.ViewModelLocator;
+using ViewModels.ViewModels;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
@@ -22,7 +23,12 @@ namespace DatMailReader.View
         public MainPage()
         {
             this.InitializeComponent();
-            MainViewModel.init();
+            this.Loaded += OnLoaded;
+        }
+
+        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            Vm.Init();
         }
     }
 }
