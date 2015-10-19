@@ -10,14 +10,6 @@ namespace DatMailReader.View
     /// </summary>
     public sealed partial class MainPage : Page
     {
-       public MainViewModel Vm
-        {
-            get
-            {
-                return (MainViewModel)DataContext;
-            }
-        }
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -25,8 +17,9 @@ namespace DatMailReader.View
         }
 
         private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            Vm.Init();
+        { 
+            var viewModel = DataContext as MainViewModel;
+            viewModel.Initialize();
         }
     }
 }

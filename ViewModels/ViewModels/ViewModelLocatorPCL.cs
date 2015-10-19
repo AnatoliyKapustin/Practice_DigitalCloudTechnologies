@@ -1,33 +1,19 @@
 ﻿namespace DatMailReader.ViewModels.ViewModels
 {
     using GalaSoft.MvvmLight.Ioc;
+    using GalaSoft.MvvmLight.Views;
     using Microsoft.Practices.ServiceLocation;
 
     public class ViewModelLocatorPCL
     {
         public const string SecondPageKey = "OpenedFilePage";
+        public static INavigationService NavigationService;
 
-        public MainViewModel Main
+        public ViewModelLocatorPCL()
         {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MainViewModel>();
-            }
-        }
-        
-        public DetailViewModel detailViewModel
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<DetailViewModel>();
-            }
-        }
-
-        static ViewModelLocatorPCL()
-        {
+            /// var OpenFileService = new FileSelectionService();
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-            SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<DetailViewModel>(); 
+            ///SimpleIoc.Default.Register<IFileSelectionService>(() => OpenFileService);
         }
 
         /// <summary>

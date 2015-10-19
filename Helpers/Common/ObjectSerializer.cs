@@ -25,7 +25,7 @@
                     }
                 }
             }
-            catch(FileNotFoundException) 
+            catch
             { 
                /// throw new FileNotFoundException("Deserialization error", ex); 
             }
@@ -38,10 +38,10 @@
             try
             {
                 DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
-                StorageFile file = await ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
+                var file = await ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.OpenIfExists);
                 if (file != null)
                 {
-                    using (Stream fileStream = await file.OpenStreamForWriteAsync())
+                    using (var fileStream = await file.OpenStreamForWriteAsync())
                     {
                         serializer.WriteObject(fileStream, data);
                     }

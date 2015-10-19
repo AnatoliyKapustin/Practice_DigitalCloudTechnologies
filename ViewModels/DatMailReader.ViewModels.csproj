@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -113,6 +113,10 @@
     <Compile Include="ViewModels\ViewModelLocatorPCL.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DatMailReader.DataAccess.csproj">
+      <Project>{666e648d-a7ad-418c-93ba-68c7fbb2b0df}</Project>
+      <Name>DatMailReader.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Helpers\DatMailReader.Helpers.csproj">
       <Project>{5c343be3-5d50-4af4-900a-c77bdc40fd87}</Project>
       <Name>DatMailReader.Helpers</Name>
@@ -146,6 +150,11 @@
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
+  <Import Project="..\SharedProject1\SharedProject1.projitems" Label="Shared" Condition="Exists('..\SharedProject1\SharedProject1.projitems')" />
+  <Import Project="..\Services\Services.projitems" Label="Shared" Condition="Exists('..\Services\Services.projitems')" />
+  <Import Project="..\Services\Services.projitems" Label="Shared" Condition="Exists('..\Services\Services.projitems')" />
+  <Import Project="..\Services\Services.projitems" Label="Shared" Condition="Exists('..\Services\Services.projitems')" />
+  <Import Project="..\Services\Services.projitems" Label="Shared" Condition="Exists('..\Services\Services.projitems')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

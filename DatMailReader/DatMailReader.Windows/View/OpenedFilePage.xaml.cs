@@ -1,5 +1,7 @@
 ﻿using DatMailReader.Helpers.Common;
+using DatMailReader.ViewModels.ViewModels;
 using System;
+using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
@@ -38,6 +40,7 @@ namespace DatMailReader.View
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += navigationHelper_LoadState;
             this.navigationHelper.SaveState += navigationHelper_SaveState;
+            this.Loaded += OnLoaded;
         }
 
         /// <summary>
@@ -69,6 +72,12 @@ namespace DatMailReader.View
 
         }
 
+        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        { 
+            var detailViewModel = DataContext as DetailViewModel;
+            detailViewModel.Initialize();
+        }
+
         #region NavigationHelper registration
 
         /// The methods provided in this section are simply used to allow
@@ -83,6 +92,8 @@ namespace DatMailReader.View
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedTo(e);
+            var detailViewModel = DataContext as DetailViewModel;
+            detailViewModel.RecievedFile = e.Parameter as StorageFile;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

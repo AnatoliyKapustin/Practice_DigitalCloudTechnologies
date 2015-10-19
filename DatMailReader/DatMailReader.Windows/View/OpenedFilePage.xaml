@@ -7,61 +7,181 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="using:DatMailReader.Helpers.Converters"
     xmlns:local="using:DatMailReader.Helpers.Extensions"
+    xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
     xmlns:common="using:DatMailReader.Helpers.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    DataContext="{Binding detailViewModel, Source={StaticResource Locator}}">
+    mc:Ignorable="d">
 
     <Page.Resources>
+        <vm:DetailViewModel x:Key="DetailViewModel"/>
         <converters:ThumbnailToImageConverter x:Key="ThumbnailToImageConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BooleanToVisiblityConverter"/>
     </Page.Resources>
 
+    <Page.DataContext>
+        <Binding Source="{StaticResource DetailViewModel}" />
+    </Page.DataContext>
+
     <Grid Background="#FFE4F1F9">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="0.5*"/>
-            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="FilesCount" HorizontalAlignment="Left" VerticalAlignment="Stretch" Margin="20,10,0,10" TextWrapping="Wrap" Text="{Binding Title}" Height="60" Width="Auto" FontSize="48" Foreground="#FF54B7FB" Grid.Column="1" Grid.Row="0"/>
         <Button x:Name="BackButton"
                     Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
                     Style="{StaticResource RoundedButton}"
                     Content="&#xe112;"                 
                     FontFamily="Segoe UI Symbol"
-                    Margin="50,30,0,0"
-                    VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                    Margin="120,30,0,20"
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Left"
                     AutomationProperties.Name="Back"
                     AutomationProperties.AutomationId="BackButton"
-                    AutomationProperties.ItemType="Navigation Button" Foreground="#FF33A7F7" Grid.Column="0" Grid.Row="0">
+                    AutomationProperties.ItemType="Navigation Button"
+                    Foreground="#FF33A7F7">
         </Button>
-        <GridView x:Name="gridName" ItemsSource="{Binding FileInf, Mode=OneWay}" Margin="20,10,20,10" SelectionMode="None" IsItemClickEnabled="True" IsRightTapEnabled="True" local:ItemClickCommandExtension.Command="{Binding MyItemClickCommand}" Grid.Column="1" Grid.Row="5">
-            <GridView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel x:Name="ExtractedAttSP" Width="200" Height="100" Orientation="Horizontal" Background="#FF54B7FB">
-                        <Image Source="{Binding Thumbnail, Converter={StaticResource ThumbnailToImageConverter}}" Height="50" Width="50" HorizontalAlignment="Left" Margin="10,0,0,40"/>
-                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Top" FontWeight="Bold" TextWrapping="Wrap" Margin="20,10,10,10"/>
-                        <TextBlock Text="{Binding Size}" VerticalAlignment="Bottom" Margin="-80,10,30,50"/>
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
-        </GridView>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,0,10" TextWrapping="Wrap" Text="From:" Height="25" Width="55" Foreground="#FF464444" FontSize="20" Grid.Column="1" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="80,10,0,10" TextWrapping="Wrap" Text="{Binding From}" Height="25" Width="Auto" Foreground="#FF464444" FontSize="20" Grid.Column="1" Grid.Row="1"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,0,10" TextWrapping="Wrap" Text="To:" Height="20" Width="30" Foreground="#FF464444" FontSize="20" Grid.Column="1" Grid.Row="2"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,10,0,10" TextWrapping="Wrap" Text="Toooooo" Height="20" Width="Auto" Foreground="#FF464444" FontSize="20" Grid.Column="1" Grid.Row="2"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,0,10" TextWrapping="Wrap" Text="Date:" Height="20" Width="55" Foreground="#FF464444" FontSize="20" Grid.Column="1" Grid.Row="3"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,10,0,10" TextWrapping="NoWrap" Text="Attachments" FontSize="36" Foreground="#FF33A7F7" Height="40" Width="200" Grid.Column="1" Grid.Row="4"/>
-        <Button HorizontalAlignment="Left" VerticalAlignment="Center" Content="&#xe105;" Foreground="#FF33A7F7" FontFamily="Segoe UI Symbol" Margin="250,0,0,0" Command="{Binding SaveAllCommand}" Style="{StaticResource RoundedButton}" Grid.Column="1" Grid.Row="4"/>
-        <WebView HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Margin="20,10,0,10" Width="Auto" local:HTMLToTextExtension.HTMLText="{Binding HTMLMessage}" Grid.Column="1" Grid.Row="6"/>
-        <RichEditBox x:Name="RichTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Margin="20,10,0,10" Width="Auto" local:RtfTextExtension.RichText="{Binding RtfString}" BorderBrush="{x:Null}" Background="{x:Null}" Grid.Column="1" Grid.Row="6"/>
+        <TextBlock 
+            HorizontalAlignment="Left" 
+            VerticalAlignment="Center"
+            Margin="200,30,0,20"
+            TextWrapping="Wrap" 
+            Text="{Binding Title}" 
+            FontSize="48" 
+            Foreground="#FF54B7FB"/>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                TextWrapping="Wrap" 
+                Text="From:" 
+                Margin="200,10,0,0"
+                Foreground="#FF464444" 
+                FontSize="20"/>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                TextWrapping="Wrap" 
+                Margin="260,10,0,0"
+                Text="{Binding Sender}" 
+                Foreground="#FF464444" 
+                FontSize="20"/>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                TextWrapping="Wrap" 
+                Text="To:" 
+                Margin="200,10,0,0"
+                Foreground="#FF464444" 
+                FontSize="20" 
+                Grid.Row="1"/>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                TextWrapping="Wrap"
+                Margin="230,10,0,0"
+                Text="Toooooo" 
+                Foreground="#FF464444" 
+                FontSize="20" 
+                Grid.Row="1"/>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                TextWrapping="Wrap" 
+                Margin="200,10,0,0"
+                Text="Date:" 
+                Foreground="#FF464444" 
+                FontSize="20" 
+                Grid.Row="2"/>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                Visibility="{Binding ExtractedMessage, Converter={StaticResource BooleanToVisiblityConverter}}" 
+                Text="Attachments" 
+                Margin="200,10,0,0"
+                FontSize="36" 
+                Foreground="#FF33A7F7"/>
+            <Button 
+                HorizontalAlignment="Left" 
+                VerticalAlignment="Center" 
+                Content="&#xe105;" 
+                Visibility="{Binding ExtractedMessage, Converter={StaticResource BooleanToVisiblityConverter}}" 
+                Foreground="#FF33A7F7" 
+                Margin="410,10,0,0"
+                FontFamily="Segoe UI Symbol" 
+                Command="{Binding SaveAllCommand}" 
+                Style="{StaticResource RoundedButton}"/>
+            <GridView 
+                ItemsSource="{Binding ExtractedFilesFromMessage}" 
+                Visibility="{Binding ExtractedMessage, Converter={StaticResource BooleanToVisiblityConverter}}" 
+                SelectionMode="None" 
+                IsItemClickEnabled="True" 
+                Margin="200,10,10,0"
+                IsRightTapEnabled="True" 
+                local:ItemClickCommandExtension.Command="{Binding MyItemClickCommand}" 
+                Grid.Row="1">
+                <GridView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="200" Height="100" Background="Gray">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Image 
+                                Source="{Binding Thumbnail, Converter={StaticResource ThumbnailToImageConverter}}" 
+                                Height="50" 
+                                Width="50" 
+                                Margin="10,10,0,0"
+                                HorizontalAlignment="Left" 
+                                VerticalAlignment="Center"
+                                Grid.RowSpan="2"/>
+                            <TextBlock 
+                                Text="{Binding DisplayName}" 
+                                VerticalAlignment="Top" 
+                                FontWeight="Bold"
+                                Margin="70,10,0,0"
+                                TextWrapping="Wrap"/>
+                            <TextBlock 
+                                Text="{Binding Size}" 
+                                VerticalAlignment="Bottom" 
+                                Grid.Row="1"
+                                Margin="70,10,0,0"/>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+            </GridView>
+        </Grid>
+        <WebView 
+            HorizontalAlignment="Left" 
+            VerticalAlignment="Top" 
+            Margin="200,10,0,0" 
+            local:HTMLToTextExtension.HTMLText="{Binding HTMLMessage}" 
+            Grid.Row="3"/>
+        <RichEditBox 
+            HorizontalAlignment="Left" 
+            VerticalAlignment="Top" 
+            Margin="200,10,0,0" 
+            local:RtfTextExtension.RichText="{Binding RtfString}" 
+            BorderBrush="{x:Null}" 
+            Background="{x:Null}" 
+            Grid.Row="3"/>
     </Grid>
 </Page>

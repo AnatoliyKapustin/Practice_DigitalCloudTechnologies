@@ -2,7 +2,7 @@
 using System;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Helpers.Common;
+using DatMailReader.Helpers.Common;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 

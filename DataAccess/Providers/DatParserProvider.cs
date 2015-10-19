@@ -1,5 +1,6 @@
-﻿namespace DatMailReader.Helpers.Providers
+﻿namespace DatMailReader.DataAccess.Providers
 {
+    using DatMailReader.Helpers.Common;
     using MimeKit;
     using MimeKit.IO;
     using MimeKit.IO.Filters;
@@ -16,61 +17,65 @@
 
     public class DatParserProvider
     {
-        private MimeMessage message = new MimeMessage();
+        private static DatParserProvider datParser;
+        private MimeMessage message;
         private StorageItemThumbnail thumb;
         private DateTimeOffset date;
         private string size;
         private string from;
-
-        public async Task<ObservableCollection<FileInfo>> OpenTnef(StorageFile file, ObservableCollection<FileInfo> targetCollection)
+        private string fileName;
+        private StorageFile bodyFile;
+        private readonly static Lazy<DatParserProvider> instance = new Lazy<DatParserProvider>(() => new DatParserProvider(), true);
+        
+        public static DatParserProvider Instance
         {
-            string FileName = file.DisplayName;
-            Stream sRead = await WindowsRuntimeStorageExtensions.OpenStreamForReadAsync(file);     
-            try
+            get
             {
-                TnefReader tnefReader = new TnefReader(sRead, 0, TnefComplianceMode.Loose);
-                message = ExtractTnefMessage(tnefReader);
-                
-                foreach (MimePart mimePart in message.Attachments)
-                {
-                    StorageFile isoFile = await DatParserProvider.writeFileToIsoStorage(mimePart.FileName, mimePart.ContentObject.Open());
-                    BasicProperties basicProperties = await isoFile.GetBasicPropertiesAsync();
-                    thumb = await isoFile.GetThumbnailAsync(ThumbnailMode.DocumentsView);
-                    date = (DateTimeOffset)mimePart.ContentDisposition.ModificationDate;
-                    size = FileSizeString((double)basicProperties.Size);
-                    from = file.Name;
-                    targetCollection.Add(new FileInfo(isoFile, thumb, date, size, from, message.Subject, FileName));
-                }
-                TextPart body = Enumerable.FirstOrDefault<TextPart>(Enumerable.OfType<TextPart>(message.BodyParts));
-                if (body != null && body.Text != null)
-                {
-                    string bodyFileName = "Message_Body.";
-                    if (body.IsHtml)
-                    {
-                        bodyFileName += "html";
-                    }
-                    else if (body.IsPlain)
-                    {
-                        bodyFileName += "txt";
-                    }
-                    else if (body.IsRichText)
-                    {
-                        bodyFileName += "rtf";
-                    }
-                    StorageFile bodyFile = await DatParserProvider.writeFileToIsoStorage(bodyFileName, body.Text);
-                    targetCollection.Add(new FileInfo(bodyFile, null, date, string.Empty, string.Empty, string.Empty, string.Empty));
-                }
+                return instance.Value;
             }
-            catch
-            {
-               
-            }
-            return targetCollection;
         }
 
-        public MimeMessage getMessage()
-        {
-            return message;
+        public async Task<Message> OpenTnef(StorageFile file, Message targetMessage)
+        {         
+            List<FileInfo> targetFilesCollection = new List<FileInfo>();
+            this.fileName = file.DisplayName;
+            Stream sRead = await WindowsRuntimeStorageExtensions.OpenStreamForReadAsync(file);
+            TnefReader tnefReader = new TnefReader(sRead, 0, TnefComplianceMode.Loose);
+            this.message = ExtractTnefMessage(tnefReader);
+            if (this.message.Sender == null)
+            {
+                this.message.Sender = new MailboxAddress(string.Empty, "Sender unknown");
+            }
+            foreach (MimePart mimePart in this.message.Attachments)
+            {
+                StorageFile isoFile = await DatParserProvider.writeFileToIsoStorage(mimePart.FileName, mimePart.ContentObject.Open());
+                BasicProperties basicProperties = await isoFile.GetBasicPropertiesAsync();
+                this.thumb = await isoFile.GetThumbnailAsync(ThumbnailMode.DocumentsView);
+                this.date = (DateTimeOffset)mimePart.ContentDisposition.ModificationDate;
+                this.size = FileSizeString((double)basicProperties.Size);
+                this.from = file.Name;
+                targetFilesCollection.Add(new FileInfo(isoFile, this.thumb, this.size, this.fileName));
+            }
+            TextPart body = Enumerable.FirstOrDefault<TextPart>(Enumerable.OfType<TextPart>(message.BodyParts));
+            if (body != null && body.Text != null)
+            {
+                string bodyFileName = "Message_Body.";
+                if (body.IsHtml)
+                {
+                    bodyFileName += "html";
+                }
+                else if (body.IsPlain)
+                {
+                    bodyFileName += "txt";
+                }
+                else if (body.IsRichText)
+                {
+                    bodyFileName += "rtf";
+                }
+                bodyFile = await DatParserProvider.writeFileToIsoStorage(bodyFileName, body.Text);
+            }
+            targetMessage = new Message(this.message.Subject, this.message.Sender.ToString(), string.Empty, this.message.Date.ToString(), bodyFile, targetFilesCollection);
+            return targetMessage;
         }
 
         private static string FileSizeString(double fileSize)
@@ -114,7 +119,6 @@
                         continue;
                     case TnefAttributeTag.DateSent:
                         message.Date = (DateTimeOffset)tnefPropertyReader.ReadValueAsDateTime();
-                        continue;
                         continue;
                     default:
                         continue;
@@ -312,7 +316,7 @@
         {
             StorageFolder temporaryFolder = ApplicationData.Current.TemporaryFolder;
             fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
-            StorageFile sampleFile = await temporaryFolder.CreateFileAsync(fileName, (CreationCollisionOption)1);
+            StorageFile sampleFile = await temporaryFolder.CreateFileAsync(fileName, (CreationCollisionOption)3);
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 content.CopyTo(memoryStream);
@@ -325,7 +329,7 @@
         {
             StorageFolder temporaryFolder = ApplicationData.Current.TemporaryFolder;
             fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
-            StorageFile sampleFile = await temporaryFolder.CreateFileAsync(fileName, (CreationCollisionOption)1);
+            StorageFile sampleFile = await temporaryFolder.CreateFileAsync(fileName, (CreationCollisionOption)3);
             await FileIO.WriteTextAsync(sampleFile, content);
             return sampleFile;
         }
@@ -335,23 +339,22 @@
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
             List<TnefPropertyId> text = new List<TnefPropertyId>();
             List<string> str = new List<string>();
-            string name;
             TnefPropertyReader tnefPropertyReader = reader.TnefPropertyReader;
             while (tnefPropertyReader.ReadNextProperty())
             {
                 var a = tnefPropertyReader.PropertyTag.Id;
-                var s = tnefPropertyReader.ReadValue();   
-                dictionary.Add(a.ToString(),s.ToString()); ///ConversationTopic 16378
+                var s = tnefPropertyReader.ReadValue();
+                dictionary.Add(a.ToString(), s.ToString()); ///ConversationTopic 16378 3624 3625 sentMailentryId
             }
         }
 
         private static void ExtractMapiProperties(TnefReader reader, MimeMessage message, BodyBuilder builder)
         {
-           // test(reader, message, builder);
+            ///    test(reader, message, builder);
             TnefPropertyReader tnefPropertyReader = reader.TnefPropertyReader;
             while (tnefPropertyReader.ReadNextProperty())
             {
-                switch (tnefPropertyReader.PropertyTag.Id) //ReadReceiptRequested ConversationTopic SendMailEntryID 13327
+                switch (tnefPropertyReader.PropertyTag.Id)
                 {
                     case TnefPropertyId.RtfCompressed:
                         if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Binary)
@@ -409,14 +412,6 @@
                             continue;
                         }
                         continue;
-                    case TnefPropertyId.EmailAddress:
-                        if (tnefPropertyReader.PropertyTag != null)
-                        {
-                            MailboxAddress addr = new MailboxAddress(string.Empty, tnefPropertyReader.ReadValueAsString());
-                            message.Sender = addr;
-                            continue;
-                        }
-                        continue;
                     case TnefPropertyId.ConversationTopic:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
                         if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
                         {
@@ -424,6 +419,18 @@
                             continue;
                         }
                         continue;
+                    case (TnefPropertyId)Mapi.ID.PR_PRIMARY_SEND_ACCOUNT:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
+                        // if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
+                        //{
+                        MailboxAddress sender = new MailboxAddress(string.Empty, tnefPropertyReader.ReadValueAsString());
+                        message.Sender = sender;
+                        continue;
+                    case (TnefPropertyId)Mapi.ID.PR_CLIENT_SUBMIT_TIME:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
+                        // if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
+                        //{
+                        message.Date = tnefPropertyReader.ReadValueAsDateTime();
+                        continue;
+                    //}
                     default:
                         try
                         {
@@ -437,5 +444,25 @@
                 }
             }
         }
+        /*private static MailboxAddress ParseString(string s)
+        {
+            char[] temp;
+            MailboxAddress resultAddress;
+            string resultString = s;
+            temp = resultString.ToCharArray();
+            for (int i = 0; i < temp.Length; i++)
+            {
+                if (temp[i] == ' ')
+                {
+                    while (temp[i] != ' ')
+                    {
+                        resultString += temp[i];
+                    }
+                }
+            }
+
+            resultAddress = new MailboxAddress("", resultString);
+            return resultAddress;
+        }*/
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace DatMailReader.ViewModels.ViewModels
 {
+    using DatMailReader.DataAccess.Providers;
     using DatMailReader.Helpers.Providers;
     using DatMailReader.Models.Model;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using GalaSoft.MvvmLight.Views;
-    using MimeKit;
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Threading.Tasks;
@@ -15,21 +15,17 @@
 
     public class MainViewModel : GalaSoft.MvvmLight.ViewModelBase
     {
-        private RecentFilesProvider recentFiles = new RecentFilesProvider();
-        private LastExtractedFilesProvider recentAttachments = new LastExtractedFilesProvider();
-        private DatParserProvider datParser = new DatParserProvider();
-        private INavigationService navigationService;
-        private ObservableCollection<FileInfo> file = new ObservableCollection<FileInfo>();
-        private ObservableCollection<FileInfo> recentlyExtractedAtt = new ObservableCollection<FileInfo>();
-        private ObservableCollection<StorageFile> recentlyEctractedFiles = new ObservableCollection<StorageFile>();
-        private string uniqId = string.Empty;
-        public MainViewModel(INavigationService navService)
+        private RecentFilesProvider recentFiles = RecentFilesProvider.Instance;
+        private LastExtractedFilesProvider recentAttachments = LastExtractedFilesProvider.Instance;
+        private List<FileInfo> recentlyExtractedAtt = new List<FileInfo>();
+        private List<StorageFile> recentlyEctractedFiles = new List<StorageFile>();
+
+        public MainViewModel()
         {
-            this.navigationService = navService;
-            this.NavigateCommand = new RelayCommand(() => this.navigationService.NavigateTo(ViewModelLocatorPCL.SecondPageKey));
+            this.NavigateCommand = new RelayCommand(() => ViewModelLocatorPCL.NavigationService.NavigateTo(ViewModelLocatorPCL.SecondPageKey));
             this.OpenFileCommand = new RelayCommand(() => this.OpenFileExecute());
             this.ExtractedItemClickCommand = new RelayCommand<FileInfo>((item) => { this.OpenExtractedFileBeDefaultProgram(item); });
-            this.RecentlyOpenedMailClickCommand = new RelayCommand<StorageFile>((item) => { this.ExtractAttAndNavigate(item); });
+            this.RecentlyOpenedMailClickCommand = new RelayCommand<StorageFile>((item) => { this.NavigateToDetailsPage(item); });
         }
 
         public RelayCommand NavigateCommand { get; private set; }
@@ -37,27 +33,13 @@
         public RelayCommand<FileInfo> ExtractedItemClickCommand { get; private set; }
         public RelayCommand<StorageFile> RecentlyOpenedMailClickCommand { get; private set; }
 
-        public async void Init()
+        public async void Initialize()
         {
-            this.RecentlyExtractedFiles = new ObservableCollection<StorageFile>(await this.recentFiles.GetRecentlyExtractedMails());
-            this.RecentlyExtractedAtt = new ObservableCollection<FileInfo>(await this.recentAttachments.GetAttFiles());
+            this.RecentlyExtractedFiles = new List<StorageFile>(await this.recentFiles.GetRecentlyExtractedMails());
+            this.RecentlyExtractedAtt = new List<FileInfo>(await this.recentAttachments.GetAttFiles());
         }
 
-        public ObservableCollection<FileInfo> File
-        {
-            get
-            {
-                return this.file;
-            }
-
-            set
-            {
-                this.file = value;
-                base.RaisePropertyChanged("File");
-            }
-        }
-
-        public ObservableCollection<FileInfo> RecentlyExtractedAtt
+        public List<FileInfo> RecentlyExtractedAtt
         {
             get
             {
@@ -71,7 +53,7 @@
             }
         }
 
-        public ObservableCollection<StorageFile> RecentlyExtractedFiles
+        public List<StorageFile> RecentlyExtractedFiles
         {
             get
             {
@@ -91,7 +73,7 @@
             {
                 if (FileToOpen.FilePath != null)
                 {
-                    StorageFile temp = await StorageFile.GetFileFromPathAsync(FileToOpen.FilePath);
+                    var temp = await StorageFile.GetFileFromPathAsync(FileToOpen.FilePath);
                     var options = new Windows.System.LauncherOptions();
                     await Windows.System.Launcher.LaunchFileAsync(temp);
                 }
@@ -102,40 +84,35 @@
             }
         }
 
+        /* private async void OpenFileExecute()
+         { 
+             await this.fileSelectionService.LaunchFileSelectionServiceAsync();
+             StorageFile SelectedFile = this.fileSelectionService.CompleteOutstandingSelectionService();
+             if (SelectedFile != null)
+             {
+                 recentFiles.AddDatFileToken(SelectedFile);
+                 this.GivenMessage = await TnefToCollection(SelectedFile, this.givenMessage);
+                 GetFilesFromMessage();
+                 recentAttachments.AddAttachmentToRecentFiles(this.file);
+                 NavigateToDetailsPage(this.GivenMessage);
+             }
+         }
+         */
         private async void OpenFileExecute()
         {
-            FileOpenPicker fileOpenPicker2 = new FileOpenPicker();
-            fileOpenPicker2.ViewMode = PickerViewMode.List;
-            fileOpenPicker2.FileTypeFilter.Add(".dat");
-            StorageFile SelectedFile = await fileOpenPicker2.PickSingleFileAsync();
+            FileOpenPicker fileOpenPicker = new FileOpenPicker();
+            fileOpenPicker.ViewMode = PickerViewMode.List;
+            fileOpenPicker.FileTypeFilter.Add(".dat");
+            StorageFile SelectedFile = await fileOpenPicker.PickSingleFileAsync();
             if (SelectedFile != null)
             {
-                recentFiles.AddDatFileToken(SelectedFile);
-                this.file.Clear();
-                this.File.Clear();
-                this.File = await TnefToCollection(SelectedFile, this.file);
-                recentAttachments.AddAttachmentToRecentFiles(this.File);
-                NavigateToDetailsPage(this.File);
+                this.NavigateToDetailsPage(SelectedFile);
             }
         }
 
-        private async void ExtractAttAndNavigate(StorageFile DatFile)
+        private void NavigateToDetailsPage(StorageFile fileToPass)
         {
-            this.File.Clear();
-            this.File = await TnefToCollection(DatFile, this.file);
-            NavigateToDetailsPage(File);
-        }
-
-        private void NavigateToDetailsPage(ObservableCollection<FileInfo> collection)
-        {
-            this.navigationService.NavigateTo(ViewModelLocatorPCL.SecondPageKey);
-            Messenger.Default.Send(collection, "collection");
-        }
-
-        public async Task<ObservableCollection<FileInfo>> TnefToCollection(StorageFile tnefFile, ObservableCollection<FileInfo> targetCollection)
-        {
-            this.file = await datParser.OpenTnef(tnefFile, targetCollection);
-            return file;
+            ViewModelLocatorPCL.NavigationService.NavigateTo(ViewModelLocatorPCL.SecondPageKey, fileToPass);
         }
     }
 }

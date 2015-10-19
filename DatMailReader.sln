@@ -23,11 +23,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatMailReader.Resources", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatMailReader.Helpers", "Helpers\DatMailReader.Helpers.csproj", "{5C343BE3-5D50-4AF4-900A-C77BDC40FD87}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "DatMailReader.Services.Shared", "Services\DatMailReader.Services.Shared.shproj", "{0890AD1D-B9FF-4233-ADA2-F343015B232B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatMailReader.DataAccess", "DataAccess\DatMailReader.DataAccess.csproj", "{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		DatMailReader\DatMailReader.Shared\DatMailReader.Shared.projitems*{de5464a1-d56b-46de-807e-9c259bded5ba}*SharedItemsImports = 4
 		DatMailReader\DatMailReader.Shared\DatMailReader.Shared.projitems*{2497022f-48b2-4343-9a68-f2138d4c57ff}*SharedItemsImports = 4
+		Services\Services.projitems*{d65d463f-3409-449d-932c-cbd8d4ce8b7d}*SharedItemsImports = 4
 		DatMailReader\DatMailReader.Shared\DatMailReader.Shared.projitems*{115da750-5978-42cc-83c3-631a3f250f45}*SharedItemsImports = 13
+		Services\Services.projitems*{0890ad1d-b9ff-4233-ada2-f343015b232b}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,6 +154,16 @@ Global
 		{5C343BE3-5D50-4AF4-900A-C77BDC40FD87}.Release|x64.Build.0 = Release|x64
 		{5C343BE3-5D50-4AF4-900A-C77BDC40FD87}.Release|x86.ActiveCfg = Release|x86
 		{5C343BE3-5D50-4AF4-900A-C77BDC40FD87}.Release|x86.Build.0 = Release|x86
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Release|ARM.ActiveCfg = Release|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Release|x64.ActiveCfg = Release|Any CPU
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -160,5 +176,7 @@ Global
 		{D65D463F-3409-449D-932C-CBD8D4CE8B7D} = {67CE1F23-CFF9-459A-8EF1-F4E83601F7C1}
 		{90707194-B980-468E-A51F-CBFB47B8CDD1} = {67CE1F23-CFF9-459A-8EF1-F4E83601F7C1}
 		{5C343BE3-5D50-4AF4-900A-C77BDC40FD87} = {67CE1F23-CFF9-459A-8EF1-F4E83601F7C1}
+		{0890AD1D-B9FF-4233-ADA2-F343015B232B} = {67CE1F23-CFF9-459A-8EF1-F4E83601F7C1}
+		{666E648D-A7AD-418C-93BA-68C7FBB2B0DF} = {67CE1F23-CFF9-459A-8EF1-F4E83601F7C1}
 	EndGlobalSection
 EndGlobal

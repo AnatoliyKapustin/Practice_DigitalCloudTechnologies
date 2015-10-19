@@ -4,6 +4,7 @@
     using System.Runtime.Serialization;
     using Windows.Storage;
     using Windows.Storage.FileProperties;
+using Windows.UI.Xaml.Media.Imaging;
 
     [DataContract]
     public class FileInfo
@@ -25,34 +26,18 @@
         [IgnoreDataMember]
         public StorageItemThumbnail Thumbnail { get; set; }
 
-        [IgnoreDataMember]
-        public DateTimeOffset CreationDate { get; set; }
-
-        [IgnoreDataMember]
-        public string UniqId { get; set; }
-
         [DataMember]
-        public string From { get; set; }
-
-        [IgnoreDataMember]
-        public string Subject { get; set; }
-
-        [IgnoreDataMember]
         public string SourceFileName { get; set; }
 
-        public FileInfo(StorageFile file, StorageItemThumbnail t, DateTimeOffset date, string size, string from, string subject, string fileName)
+        public FileInfo(StorageFile file, StorageItemThumbnail thumb, string size, string fileName)
         {
             this.ExtractedStorageFile = file;
             this.DisplayName = file.DisplayName;
             this.DisplayType = file.DisplayType;
-            this.CreationDate = date;
-            this.UniqId = file.FolderRelativeId;
-            this.Thumbnail = t;
+            this.Thumbnail = thumb;
             this.Size = size;
-            this.From = from;
             this.SourceFileName = fileName;
             this.FilePath = file.Path;
-            this.Subject = subject;
         }
     }
 }

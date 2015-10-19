@@ -1,41 +1,46 @@
 ﻿namespace DatMailReader.ViewModels.ViewModels
 {
+    using DatMailReader.DataAccess.Providers;
     using DatMailReader.Helpers.Providers;
     using DatMailReader.Models.Model;
     using GalaSoft.MvvmLight.Command;
     using GalaSoft.MvvmLight.Messaging;
-    using MimeKit;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.IO;
+    using System.Threading.Tasks;
     using Windows.Storage;
     using Windows.Storage.Pickers;
 
     public class DetailViewModel : GalaSoft.MvvmLight.ViewModelBase
     {
-        private DatParserProvider datParser = new DatParserProvider();
-        private MimeMessage tnefMessage;
+        private RecentFilesProvider recentFiles = RecentFilesProvider.Instance;
+        private LastExtractedFilesProvider recentAttachments = LastExtractedFilesProvider.Instance;
+        private DatParserProvider datParser = DatParserProvider.Instance;
         private string title;
-        private string from;
+        private string sender;
         private string to;
         private string dateSent;
         private string fileSize;
         private string rtfString;
         private string htmlMessage;
-        private List<FileInfo> file = new List<FileInfo>();
+        private List<FileInfo> file;
+        private StorageFile recievedFile;
+        private Message extractedMessage;
+        private List<FileInfo> extractedFilesFromMessage = new List<FileInfo>();
+      
         public DetailViewModel()
         {
-            Messenger.Default.Register<ObservableCollection<FileInfo>>(this, "collection", (o) => { this.FileInf = new List<FileInfo>(o);
-            RtfFileExecute();
-            Initialize();
-            });
-            
+            /*Messenger.Default.Register<StorageFile>(this, "datFile", (o) =>
+            {
+                this.RecievedFile = (o);                     
+            });*/
+
             this.MyItemClickCommand = new RelayCommand<FileInfo>(item => { this.OpenFileByDefaultProgram(item); });
             this.OpenFileWithCommand = new RelayCommand<FileInfo>(item => this.OpenWith(item));
             this.OpenFlyoutFileWithCommand = new RelayCommand<FileInfo>(item => this.OpenWith(item));
             this.SaveSelectedFlyoutItem = new RelayCommand<FileInfo>(item => this.SaveSelectedAttachment(item));
-            this.SaveAllCommand = new RelayCommand(() => this.SaveAllAttachments(this.FileInf));
+            this.SaveAllCommand = new RelayCommand(() => this.SaveAllAttachments(this.ExtractedFilesFromMessage));
         }
 
         public RelayCommand<FileInfo> MyItemClickCommand { get; private set; }
@@ -54,36 +59,35 @@
             set
             {
                 this.title = value;
-                base.RaisePropertyChanged("From");
+                base.RaisePropertyChanged("Title");
             }
         }
 
-        public string From
+        public string Sender
         {
             get
             {
-                return this.from;
+                return this.sender;
             }
 
             set
             {
-                this.from = value;
-                base.RaisePropertyChanged("From");
+                this.sender = value;
+                base.RaisePropertyChanged("Sender");
             }
         }
 
-        public List<FileInfo> FileInf
+        public Message ExtractedMessage
         {
             get
             {
-                return this.file;
+                return this.extractedMessage;
             }
 
             set
             {
-                this.file = value;
-                base.RaisePropertyChanged("FileInf");
-               
+                this.extractedMessage = value;
+                base.RaisePropertyChanged("ExtractedMessage");
             }
         }
 
@@ -101,6 +105,34 @@
                     this.fileSize = value;
                     base.RaisePropertyChanged("FileSize");
                 }
+            }
+        }
+
+        public List<FileInfo> ExtractedFilesFromMessage
+        {
+            get
+            {
+                return this.extractedFilesFromMessage;
+            }
+
+            set
+            {
+                this.extractedFilesFromMessage = value;
+                base.RaisePropertyChanged("ExtractedFilesFromMessage");
+            }
+        }
+
+        public StorageFile RecievedFile
+        {
+            get
+            {
+                return this.recievedFile;
+            }
+
+            set
+            {
+                this.recievedFile = value;
+                base.RaisePropertyChanged("RecievedFile");
             }
         }
 
@@ -132,20 +164,25 @@
             }
         }
 
-        public void Initialize()
+        public async void Initialize()
         {
-            if (this.file != null)
+            this.extractedFilesFromMessage.Clear();
+            this.ExtractedMessage = await this.TnefToCollection(this.RecievedFile, this.ExtractedMessage);
+            this.SerializeFiles();
+            this.RtfFileExecute();
+            if (this.ExtractedMessage != null)
             {
-                if (this.file[0].Subject != null)
+                this.Sender = this.ExtractedMessage.Sender;
+                if (this.ExtractedMessage.Subject != string.Empty)
                 {
-                    this.Title = this.file[1].Subject;
+                    this.Title = this.ExtractedMessage.Subject;
                 }
                 else
                 {
                     this.Title = "Subject not set";
                 }
             }
-        }    
+        }
 
         private async void OpenFileByDefaultProgram(FileInfo FileToOpen)
         {
@@ -167,7 +204,7 @@
 
         private async void SaveSelectedAttachment(FileInfo fileToSave)
         {
-            FolderPicker folderPicker = new FolderPicker();
+            var folderPicker = new FolderPicker();
             folderPicker.FileTypeFilter.Add("*");
             folderPicker.CommitButtonText = "Save All";
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
@@ -183,15 +220,15 @@
 
         private async void SaveAllAttachments(List<FileInfo> fileCollection)
         {
-            FolderPicker folderPicker = new FolderPicker();
+            var folderPicker = new FolderPicker();
             folderPicker.FileTypeFilter.Add("*");
             folderPicker.CommitButtonText = "Save All";
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
             if (folder != null)
             {
-                foreach (FileInfo f in fileCollection)
+                foreach (FileInfo singleFile in fileCollection)
                 {
-                    StorageFile file = f.ExtractedStorageFile;
+                    StorageFile file = singleFile.ExtractedStorageFile;
                     if (file != null)
                     {
                         StorageFile storageFile = await file.CopyAsync(folder, file.Name, NameCollisionOption.FailIfExists);
@@ -200,36 +237,40 @@
             }
         }
 
-        public async void RtfFileExecute()
+        private void SerializeFiles()
         {
-            foreach (FileInfo f in file)
-            {
-                if (f.ExtractedStorageFile.DisplayName.Contains("Message_Body") && (f.ExtractedStorageFile.DisplayName.Contains("rtf") || f.ExtractedStorageFile.DisplayName.Contains("txt")))
-                {
-                    this.RtfString = await Windows.Storage.FileIO.ReadTextAsync(f.ExtractedStorageFile);
-                    this.HTMLMessage = null;
-                    break;
-                }
-                else
-                    if (f.ExtractedStorageFile.DisplayName.Contains("Message_Body") && f.ExtractedStorageFile.DisplayName.Contains("html"))
-                    {
-                        this.HTMLMessage = await Windows.Storage.FileIO.ReadTextAsync(f.ExtractedStorageFile);
-                        this.RtfString = null;
-                        break;
-                    }
-            }
-
-           /// this.DeleterRtfFromCollection();
+            this.recentFiles.AddDatFileToken(this.RecievedFile);
+            this.GetFilesFromMessage();
+            this.recentAttachments.AddAttachmentToRecentFiles(this.ExtractedFilesFromMessage);
         }
 
-        public void DeleterRtfFromCollection()
+        public async Task<Message> TnefToCollection(StorageFile tnefFile, Message targetCollection)
         {
-            foreach (FileInfo f in file)
+            var extractedMessage = await datParser.OpenTnef(tnefFile, targetCollection);
+            return extractedMessage;
+        }
+
+        private void GetFilesFromMessage()
+        {
+            if (this.ExtractedMessage != null && this.ExtractedMessage.Files != null)
             {
-                if (f.ExtractedStorageFile.DisplayName.Contains("Message_Body"))
+                this.ExtractedFilesFromMessage = new List<FileInfo>(this.ExtractedMessage.Files);
+            }
+        }
+
+        public async void RtfFileExecute()
+        {
+            if (this.ExtractedMessage != null && this.ExtractedMessage.MessageFile != null)
+            {
+                if (this.ExtractedMessage.MessageFile.DisplayName.Contains("Message_Body") && (this.ExtractedMessage.MessageFile.DisplayName.Contains("rtf") || this.ExtractedMessage.MessageFile.DisplayName.Contains("txt")))
                 {
-                    file.Remove(f);
-                    break;
+                    this.RtfString = await Windows.Storage.FileIO.ReadTextAsync(this.ExtractedMessage.MessageFile);
+                    this.HTMLMessage = null;
+                }
+                if (this.ExtractedMessage.MessageFile.DisplayName.Contains("Message_Body") && this.ExtractedMessage.MessageFile.DisplayName.Contains("html"))
+                {
+                    this.HTMLMessage = await Windows.Storage.FileIO.ReadTextAsync(this.ExtractedMessage.MessageFile);
+                    this.RtfString = null;
                 }
             }
         }

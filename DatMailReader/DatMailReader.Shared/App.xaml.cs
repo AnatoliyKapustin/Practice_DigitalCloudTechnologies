@@ -1,25 +1,27 @@
-﻿using DatMailReader.Helpers.Common;
-using DatMailReader.View;
-using System;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Media.Animation;
-using Windows.UI.Xaml.Navigation;
-
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
+﻿// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 namespace DatMailReader
 {
+    using DatMailReader.Helpers.Common;
+    using DatMailReader.View;
+    using DatMailReader.ViewModels.ViewModels;
+    using GalaSoft.MvvmLight.Views;
+    using System;
+    using Windows.ApplicationModel;
+    using Windows.ApplicationModel.Activation;
+    using Windows.UI.Xaml;
+    using Windows.UI.Xaml.Controls;
+    using Windows.UI.Xaml.Media.Animation;
+    using Windows.UI.Xaml.Navigation;
+
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     public sealed partial class App : Application
     {
+        
 #if WINDOWS_PHONE_APP
         private TransitionCollection transitions;
 #endif
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -29,7 +31,7 @@ namespace DatMailReader
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
         }
-
+       
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
@@ -38,13 +40,15 @@ namespace DatMailReader
         /// <param name="e">Details about the launch request and process.</param>
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            var navigationService = new NavigationService();
+            navigationService.Configure(ViewModelLocatorPCL.SecondPageKey, typeof(OpenedFilePage));
+            ViewModelLocatorPCL.NavigationService = navigationService;
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
-            
             Frame rootFrame = Window.Current.Content as Frame;
            
             // Do not repeat app initialization when the Window already has content,
