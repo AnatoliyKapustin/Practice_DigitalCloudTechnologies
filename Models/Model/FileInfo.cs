@@ -4,11 +4,22 @@
     using System.Runtime.Serialization;
     using Windows.Storage;
     using Windows.Storage.FileProperties;
-using Windows.UI.Xaml.Media.Imaging;
+    using Windows.UI.Xaml.Media.Imaging;
 
     [DataContract]
     public class FileInfo
     {
+        public FileInfo(StorageFile file, string thumb, string size, string fileName)
+        {
+            this.ExtractedStorageFile = file;
+            this.DisplayName = file.DisplayName;
+            this.DisplayType = file.DisplayType;
+            this.Thumbnail = System.Text.RegularExpressions.Regex.Unescape(thumb);
+            this.Size = size;
+            this.SourceFileName = fileName;
+            this.FilePath = file.Path;
+        }
+
         [IgnoreDataMember]
         public StorageFile ExtractedStorageFile { get; set; }
 
@@ -23,21 +34,10 @@ using Windows.UI.Xaml.Media.Imaging;
         [IgnoreDataMember]
         public string Size { get; set; }
 
-        [IgnoreDataMember]
-        public StorageItemThumbnail Thumbnail { get; set; }
+        [DataMember]
+        public string Thumbnail { get; set; }
 
         [DataMember]
         public string SourceFileName { get; set; }
-
-        public FileInfo(StorageFile file, StorageItemThumbnail thumb, string size, string fileName)
-        {
-            this.ExtractedStorageFile = file;
-            this.DisplayName = file.DisplayName;
-            this.DisplayType = file.DisplayType;
-            this.Thumbnail = thumb;
-            this.Size = size;
-            this.SourceFileName = fileName;
-            this.FilePath = file.Path;
-        }
     }
 }

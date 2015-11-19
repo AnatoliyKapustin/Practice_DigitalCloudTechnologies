@@ -1,21 +1,39 @@
-﻿namespace DatMailReader.View
+﻿using DatMailReader.Models.Model;
+using DatMailReader.Shared.Helpers;
+using DatMailReader.ViewModels.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+
+// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
+
+namespace DatMailReader.View
 {
-    using DatMailReader.Helpers.Common;
-    using DatMailReader.Shared.Helpers;
-    using DatMailReader.ViewModels.ViewModels;
-    using System;
-    using Windows.Storage;
-    using Windows.UI.Xaml.Controls;
-    using Windows.UI.Xaml.Navigation;
-
-    // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
-
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class OpenedFilePage : Page
+    public sealed partial class AllExtractedAttachments : Page
     {
         private NavigationHelper navigationHelper;
+
+        public AllExtractedAttachments()
+        {
+            this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.navigationHelper.SaveState += navigationHelper_SaveState;
+        }
 
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -23,21 +41,9 @@
         /// </summary>
         public NavigationHelper NavigationHelper
         {
-            get
-            {
-                return this.navigationHelper;
-            }
+            get { return this.navigationHelper; }
         }
 
-        public OpenedFilePage()
-        {
-            this.InitializeComponent();
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += navigationHelper_LoadState;
-            this.navigationHelper.SaveState += navigationHelper_SaveState;
-            this.Loaded += OnLoaded;
-
-        }
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -54,16 +60,6 @@
         {
 
         }
-
-        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            var detailViewModel = DataContext as ExtractedFileViewModel;
-            if (detailViewModel != null)
-            {
-                detailViewModel.Initialize();
-            }
-        }
-
 
         /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
@@ -91,12 +87,9 @@
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.navigationHelper.OnNavigatedTo(e);
-            var detailViewModel = DataContext as ExtractedFileViewModel;
-            if (detailViewModel != null)
-            {
-                detailViewModel.RecievedFileToken = e.Parameter as StorageFile;
-            }
+            this.NavigationHelper.OnNavigatedTo(e);
+            var allExtractedAttachments = DataContext as AllExtractedAttachmentsViewModel;
+            allExtractedAttachments.AllExtractedAttachments = e.Parameter as List<FileInfo>;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

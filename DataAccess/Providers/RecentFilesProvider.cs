@@ -13,8 +13,8 @@
         private const string MailDataFileName = "MailData";
         private List<string> recentlyExtractedMailTokens = new List<string>();
         private List<StorageFile> recentlyExtractedStorageFiles = new List<StorageFile>();
-
         private readonly static Lazy<RecentFilesProvider> instance = new Lazy<RecentFilesProvider>(() => new RecentFilesProvider(), true);
+        
         public static RecentFilesProvider Instance
         {
             get
@@ -54,26 +54,32 @@
         private async Task<List<StorageFile>> GetFilesByToken()
         {
             this.recentlyExtractedStorageFiles.Clear();
-            foreach (String s in recentlyExtractedMailTokens)
+            foreach (var token in recentlyExtractedMailTokens)
             {
-                var file = await GetSingleStorageFile(s);
-                this.recentlyExtractedStorageFiles.Add(file);
+                var file = await this.GetSingleStorageFile(token);
+                if (file != null)
+                {
+                    this.recentlyExtractedStorageFiles.Add(file);
+                }
             }
 
-            return recentlyExtractedStorageFiles;
+            return this.recentlyExtractedStorageFiles;
         }
 
         private async Task<StorageFile> GetSingleStorageFileByToken(string id)
         {
             var file = await GetSingleStorageFile(id);
-            this.recentlyExtractedStorageFiles.Add(file);
+            if (file != null)
+            {
+                this.recentlyExtractedStorageFiles.Add(file);
+            }
 
             return file;
         }
 
         private async Task<StorageFile> GetSingleStorageFile(string token)
         {
-            StorageFile result = null;
+            var result = default(StorageFile);
             try
             {
                 if (StorageApplicationPermissions.FutureAccessList.ContainsItem(token))
@@ -81,17 +87,14 @@
                     result = await StorageApplicationPermissions.FutureAccessList.GetFileAsync(token);
                 }
             }
-            catch (FileNotFoundException ex)
-            {
-                throw new FileNotFoundException("Can't open file", ex);
-            }
+            catch (FileNotFoundException) { }
 
             return result;
         }
 
         private string GetUniqIdForFile(StorageFile file)
         {
-            char[] temp = file.FolderRelativeId.ToCharArray();
+            var temp = file.FolderRelativeId.ToCharArray();
             int index = 0;
             for (int i = 0; i < temp.Length; i++)
             {
@@ -100,8 +103,8 @@
                     index = i;
                 }
             }
-            var result = file.FolderRelativeId.Remove(index);
-            return result;
+
+            return file.FolderRelativeId.Remove(index);
         }
     }
 }

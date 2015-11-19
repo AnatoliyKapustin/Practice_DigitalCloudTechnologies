@@ -8,8 +8,4 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Services</Import_RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Services\FileSelectionService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\IFileSelectionService.cs" />
-  </ItemGroup>
 </Project>

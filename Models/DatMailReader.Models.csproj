@@ -107,6 +107,8 @@
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\Tokens.cs" />
+    <Compile Include="Interfaces\IFileSelectionService.cs" />
     <Compile Include="Model\FileInfo.cs" />
     <Compile Include="Model\Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

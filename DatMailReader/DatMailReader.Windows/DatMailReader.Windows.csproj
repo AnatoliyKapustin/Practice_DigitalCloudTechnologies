@@ -104,8 +104,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="View\OpenedFilePage.xaml.cs">
-      <DependentUpon>OpenedFilePage.xaml</DependentUpon>
+    <Compile Include="View\AllExtractedAttachments.xaml.cs">
+      <DependentUpon>AllExtractedAttachments.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AllRecentDatFiles.xaml.cs">
+      <DependentUpon>AllRecentDatFiles.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ExtractedFilePage.xaml.cs">
+      <DependentUpon>ExtractedFilePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -127,7 +133,15 @@
     <Content Include="Assets\StoreLogo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="View\OpenedFilePage.xaml">
+    <Page Include="View\AllExtractedAttachments.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AllRecentDatFiles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ExtractedFilePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,6 +180,10 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DataAccess\DatMailReader.DataAccess.csproj">
+      <Project>{666e648d-a7ad-418c-93ba-68c7fbb2b0df}</Project>
+      <Name>DatMailReader.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Helpers\DatMailReader.Helpers.csproj">
       <Project>{5c343be3-5d50-4af4-900a-c77bdc40fd87}</Project>
       <Name>DatMailReader.Helpers</Name>

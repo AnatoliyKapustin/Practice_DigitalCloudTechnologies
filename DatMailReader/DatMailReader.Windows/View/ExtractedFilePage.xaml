@@ -1,0 +1,174 @@
+﻿<Page
+    x:Name="pageRoot"
+    x:Class="DatMailReader.View.ExtractedFilePage"
+    xmlns:i="using:Microsoft.Xaml.Interactivity" 
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:DatMailReader.Helpers.Converters"
+    xmlns:local="using:DatMailReader.Helpers.Extensions"
+    xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
+    xmlns:common="using:DatMailReader.Helpers.Common"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <vm:ExtractedFileViewModel x:Key="ExtractedFileViewModel"/>
+        <converters:EmptyToVisibilityConverter x:Key="EmptyToVisiblityConverter"/>
+        <converters:NameToStyleConverter x:Key="NameToStyleConverter"/>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <Binding Source="{StaticResource ExtractedFileViewModel}"/>
+    </Page.DataContext>
+
+    <Grid Background="#FFE4F1F9">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Button
+            Margin="45 0 0 0"
+            Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
+            Style="{StaticResource RoundedButton}"
+            Content="&#xe112;"            
+            HorizontalAlignment="Center"
+            FontSize="40"/>
+        <TextBlock 
+            Style="{StaticResource SubjectTextBlockStyle}"
+            Text="{Binding ExtractedMessage.Subject}" 
+            Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+            Grid.Column="1"/>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Style="{StaticResource TextBlockMessageSenderInformation}"
+                        Text="From:"/>
+                    <TextBlock
+                        Style="{StaticResource TextBlockMessageSenderInformation}" 
+                        Text="{Binding ExtractedMessage.Sender}"
+                        Grid.Column="1"/>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Style="{StaticResource TextBlockMessageSenderInformation}"
+                        Text="To:"/>
+                    <TextBlock 
+                        Style="{StaticResource TextBlockMessageSenderInformation}"
+                        Text="{Binding ExtractedMessage.To}"
+                        Grid.Column="1"/>
+                </Grid>
+                <TextBlock
+                    Style="{StaticResource TextBlockMessageSenderInformation}"
+                    Text="Date"
+                    Margin="0 0 0 36"
+                    Grid.Row="2"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock 
+                            Style="{StaticResource RecentFilesTextBlockStyle}" 
+                            Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+                            Text="Attachments" 
+                            FontSize="30"/>
+                    <Button
+                        Content="&#xe105;" 
+                        Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}"     
+                        Margin="24 0 0 0"
+                        FontSize="30"
+                        HorizontalAlignment="Center"
+                        Command="{Binding SaveAllCommand}" 
+                        Style="{StaticResource RoundedButton}"
+                        Grid.Column="1"/>
+                </Grid>
+                <GridView
+                    Grid.Row="1" 
+                    Margin="0 24 0 48"
+                    ItemsSource="{Binding ExtractedFilesFromMessage}" 
+                    Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+                    SelectionMode="None"
+                    IsItemClickEnabled="True"
+                    local:ItemClickCommandExtension.Command="{Binding MyItemClickCommand}">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid
+                                Width="310" 
+                                Height="90"
+                                Background="#0090ff"
+                                Margin="0 0 12 0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentControl
+                                    Style="{Binding Thumbnail, Converter={StaticResource NameToStyleConverter}}"/>
+                                <Grid
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Style="{StaticResource GridViewTextBlockStyle}"
+                                        Text="{Binding DisplayName}"/>
+                                    <TextBlock 
+                                        Style="{StaticResource GridViewFromTextBox}"
+                                        Text="{Binding Size}" 
+                                        Grid.Row="1"/>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                </GridView>
+            </Grid>
+            <Grid Grid.Row="2">
+                <WebView
+                    local:HTMLToTextExtension.HTMLText="{Binding HTMLMessage}"/>
+                <RichEditBox
+                    FontSize="18"
+                    FontWeight="Normal"
+                    local:RtfTextExtension.RichText="{Binding RtfString}" 
+                    BorderBrush="{x:Null}" 
+                    Background="{x:Null}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

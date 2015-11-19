@@ -2,7 +2,7 @@
 
 namespace DatMailReader.View
 {
-    using DatMailReader.ViewModelLocator;
+    using DatMailReader.Shared.Services;
     using DatMailReader.ViewModels.ViewModels;
     using Windows.UI.Xaml.Controls;
 
@@ -12,14 +12,6 @@ namespace DatMailReader.View
     public sealed partial class MainPage : Page
     {
 
-        public MainViewModel Vm
-        {
-            get
-            {
-                return (MainViewModel)DataContext;
-            }
-        }
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -28,7 +20,11 @@ namespace DatMailReader.View
 
         private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
-            Vm.Initialize();
+            var fileService = FileSelectionService.Instance;
+            fileService.Initialize();
+            var viewModel = DataContext as MainViewModel;
+            viewModel.Initialize();
+            viewModel.fileOpenService = fileService;
         }
     }
 }

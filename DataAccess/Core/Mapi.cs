@@ -1,4 +1,4 @@
-﻿namespace DatMailReader.Helpers.Common
+﻿namespace DatMailReader.DataAccess.Core
 {
     public class Mapi
     {

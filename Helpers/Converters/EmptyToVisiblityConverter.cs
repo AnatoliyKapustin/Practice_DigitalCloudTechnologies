@@ -2,23 +2,25 @@
 {
     using DatMailReader.Models.Model;
     using System;
+    using System.Collections;
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Data;
 
-    public class BoolToVisibilityConverter : IValueConverter
+    public class EmptyToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            var collection = value as ICollection;
             var result = false;
-            var message = value as Message;
-            if(message != null && message.Files.Count != 0)
-            {
-                result = true;
-            }
-            else
+            if (value == null)
             {
                 result = false;
             }
+            else if (collection != null)
+            {
+                result = collection.Count != 0;
+            }
+
             return result ? Visibility.Visible : Visibility.Collapsed;
         }
 

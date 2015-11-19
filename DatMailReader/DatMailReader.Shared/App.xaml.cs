@@ -2,6 +2,7 @@
 namespace DatMailReader
 {
     using DatMailReader.Helpers.Common;
+    using DatMailReader.Shared.Helpers;
     using DatMailReader.View;
     using DatMailReader.ViewModels.ViewModels;
     using GalaSoft.MvvmLight.Views;
@@ -41,7 +42,11 @@ namespace DatMailReader
         protected async override void OnLaunched(LaunchActivatedEventArgs e)
         {
             var navigationService = new NavigationService();
-            navigationService.Configure(ViewModelLocatorPCL.SecondPageKey, typeof(OpenedFilePage));
+            navigationService.Configure(ViewModelLocatorPCL.ExtractedFilePageKey, typeof(ExtractedFilePage));
+#if WINDOWS_APP
+            navigationService.Configure(ViewModelLocatorPCL.AllDatFilesPage, typeof(AllRecentDatFiles));
+            navigationService.Configure(ViewModelLocatorPCL.AllAttachmentsPage, typeof(AllExtractedAttachments));
+#endif
             ViewModelLocatorPCL.NavigationService = navigationService;
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)

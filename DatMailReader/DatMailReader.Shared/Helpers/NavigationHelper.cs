@@ -1,4 +1,4 @@
-﻿namespace DatMailReader.Helpers.Common
+﻿namespace DatMailReader.Shared.Helpers
 {
     using GalaSoft.MvvmLight.Command;
     using System;

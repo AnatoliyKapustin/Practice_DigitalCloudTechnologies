@@ -5,16 +5,19 @@
     xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
     xmlns:common="using:DatMailReader.Helpers.Common"
     xmlns:local="using:DatMailReader.Helpers.Extensions"
+    xmlns:converters="using:DatMailReader.Helpers.Converters"
+    xmlns:style="using:DatMailReader.Styles"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Page.Resources>
         <vm:MainViewModel x:Key="MainViewModel"/>
+        <converters:NameToStyleConverter x:Key="NameToStyleConverter"/>
     </Page.Resources>
 
     <Page.DataContext>
-        <Binding Source="{StaticResource MainViewModel}" />
+        <Binding Source="{StaticResource MainViewModel}"/>
     </Page.DataContext>
 
     <Grid Background="#FFDDE7F3">
@@ -24,79 +27,66 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Button x:Name="openFileButton" 
-                Content="&#xE120; extract"
-                FontFamily="Segoe UI Symbol" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center"
+        <Button Style="{StaticResource RectangleButton}"
+                Content="extract"
                 Command="{Binding OpenFileCommand}" 
-                Height="115"
-                Width="415"
-                Background="#FF3BA3F9" 
-                BorderBrush="{x:Null}"
-                FontSize="48" 
-                FontWeight="ExtraLight"/>
-        <Grid Grid.Row="1">
+                Height="130"
+                Width="470">
+        </Button>
+        <Grid 
+            Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock 
-                HorizontalAlignment="Left" 
-                Margin="120,0,0,0" 
-                TextWrapping="WrapWholeWords" 
-                Text="recently extracted" 
-                VerticalAlignment="Center" 
-                Foreground="#FF3BA3F9" 
-                SelectionHighlightColor="{x:Null}" 
-                FontSize="24" />
-            <Button 
-                Margin="310,0,0,0" 
-                Content="&#xe106;" 
-                FontFamily="Segoe UI Symbol" 
-                HorizontalAlignment="Left"
-                VerticalAlignment="Center"
-                Foreground="#FF3BA3F9" 
-                BorderBrush="{x:Null}"/>
+            <Grid
+                x:Name="RecentDatFilesTextblockAndAllFilesBtn"
+                Margin="120 0 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Style="{StaticResource RecentFilesTextBlockStyle}"
+                    Margin="0"
+                    Text="recently extracted"/>
+                <Button  
+                    Content="&#xe106;"
+                    Style="{StaticResource XButton}"
+                    Command="{Binding GotoAllDatFilesPageCommand}"
+                    Grid.Column="1"/>
+            </Grid>
             <GridView 
-                ItemsSource="{Binding RecentlyExtractedFiles, Mode=OneWay}" 
-                VerticalAlignment="Bottom" 
-                SelectionMode="None" 
-                IsItemClickEnabled="True"  
-                local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
-                IsDoubleTapEnabled="False" 
-                IsHoldingEnabled="False" 
-                IsRightTapEnabled="False" 
-                IsTapEnabled="False"
-                Margin="120,0,0,0"
-                Grid.Row="1">
+                    x:Name="RecentExtractedDatFiles"
+                    ItemsSource="{Binding RecentlyExtractedFiles}" 
+                    SelectionMode="None" 
+                    IsItemClickEnabled="True"
+                    Margin="120,24,0,54"
+                    local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
+                    Grid.Row="1">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Background="#FF54B7FB" Width="200" Height="100">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock                                 
-                                Text="&#xE166;" 
-                                FontSize="36" 
-                                Margin="10,10,0,0"
-                                HorizontalAlignment="Left"
-                                FontFamily="Segoe UI Symbol" 
-                                VerticalAlignment="Center"
-                                Grid.RowSpan="2"/>
-                            <TextBlock                              
-                                Text="{Binding DisplayName}" 
-                                FontFamily="Segoe UI Symbol"
-                                Margin="30,10,0,0"
-                                VerticalAlignment="Center" 
-                                HorizontalAlignment="Center"/>
+                        <Grid
+                            Background="#0090ff" 
+                            Width="310" 
+                            Height="90"
+                            Margin="0 0 12 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ContentControl                   
+                                Style="{StaticResource MailIcon}"/>
+                            <TextBlock
+                                Style="{StaticResource GridViewTextBlockStyle}"
+                                Text="{Binding DisplayName}"
+                                Grid.Column="1"/>
                         </Grid>
                     </DataTemplate>
                 </GridView.ItemTemplate>
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <ItemsWrapGrid Orientation="Horizontal"/>
+                        <ItemsStackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
             </GridView>
@@ -106,63 +96,105 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBlock 
-                HorizontalAlignment="Left" 
-                Margin="120,0,0,0" 
-                TextWrapping="WrapWholeWords" 
-                Text="extracted attachments" 
-                VerticalAlignment="Center" 
-                Foreground="#FF3BA3F9" 
-                SelectionHighlightColor="{x:Null}" 
-                FontSize="24" />
-            <Button 
-                Margin="355,0,0,0" 
-                Content="&#xE106;" 
-                FontFamily="Segoe UI Symbol"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Left"
-                Foreground="#FF3BA3F9" 
-                BorderBrush="{x:Null}"/>
+            <Grid
+                x:Name="RecentExtractedFilesTextBlockAndAllFilesBtn"
+                Margin="120 0 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Style="{StaticResource RecentFilesTextBlockStyle}"
+                    Text="extracted attachments"/>
+                <Button 
+                    Style="{StaticResource XButton}"
+                    Command="{Binding GoToAllAttachmentsPageCommand}"
+                    Content="&#xE106;"
+                    Grid.Column="1"/>
+            </Grid>
             <GridView 
-                ItemsSource="{Binding RecentlyExtractedAtt, Mode=OneWay}" 
-                VerticalAlignment="Bottom"
+                x:Name="RecentExtractedFiles"
+                ItemsSource="{Binding RecentlyExtractedAttachments}" 
                 SelectionMode="None" 
                 IsItemClickEnabled="True" 
                 Grid.Row="1" 
-                Margin="120,0,0,0"
-                local:ItemClickCommandExtension.Command="{Binding ExtractedItemClickCommand}" 
-                IsDoubleTapEnabled="False" 
-                IsHoldingEnabled="False" 
-                IsRightTapEnabled="False" >
+                Margin="120,24,0,54"
+                local:ItemClickCommandExtension.Command="{Binding ExtractedItemClickCommand}">
                 <GridView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Background="#FF54B7FB" Width="200" Height="100">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock 
-                                VerticalAlignment="Bottom" 
-                                HorizontalAlignment="Left"
-                                TextWrapping="Wrap" 
-                                Text="{Binding DisplayName}"
-                                Margin="70,10,0,0"/>
-                            <TextBlock 
-                                VerticalAlignment="Top" 
-                                HorizontalAlignment="Left"
-                                TextWrapping="Wrap" 
-                                Text="{Binding SourceFileName}"
-                                Margin="70,10,0,0"
-                                Grid.Row="1"/>
+                        <Grid 
+                            Background="#0090ff" 
+                            Width="310" 
+                            Height="90"
+                            Margin="0 0 12 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ContentControl
+                                 Style="{Binding Thumbnail, Converter={StaticResource NameToStyleConverter}}"/>
+                            <Grid 
+                                VerticalAlignment="Center"
+                                Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock 
+                                    Style="{StaticResource GridViewTextBlockStyle}"
+                                    Text="{Binding DisplayName}"/>
+                                <TextBlock 
+                                    Style="{StaticResource GridViewFromTextBox}"
+                                    Text="{Binding SourceFileName}"
+                                    Grid.Row="1"/>
+                            </Grid>
                         </Grid>
                     </DataTemplate>
                 </GridView.ItemTemplate>
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <ItemsWrapGrid Orientation="Horizontal"/>
+                        <ItemsStackPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </GridView.ItemsPanel>
             </GridView>
         </Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="Smaller">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedDatFiles">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>10 0 0 0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedFiles">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>10 0 0 0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentDatFilesTextblockAndAllFilesBtn">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>10 0 0 0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedFilesTextBlockAndAllFilesBtn">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>10 0 0 0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Default"/>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

@@ -6,14 +6,14 @@
 
     public class ViewModelLocatorPCL
     {
-        public const string SecondPageKey = "OpenedFilePage";
+        public const string ExtractedFilePageKey = "ExractedFilePage";
+        public const string AllDatFilesPage = "DatFilesPage";
+        public const string AllAttachmentsPage = "AttacmentsPage";
         public static INavigationService NavigationService;
 
         public ViewModelLocatorPCL()
         {
-            /// var OpenFileService = new FileSelectionService();
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-            ///SimpleIoc.Default.Register<IFileSelectionService>(() => OpenFileService);
         }
 
         /// <summary>

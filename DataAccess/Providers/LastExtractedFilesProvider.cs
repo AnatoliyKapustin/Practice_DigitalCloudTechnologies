@@ -9,10 +9,12 @@
 
     public class LastExtractedFilesProvider
     {
-        private const string AttachmentFileName = "AttData";
-        private List<FileInfo> recentlyExtractedAttachment = new List<FileInfo>();
-
         private readonly static Lazy<LastExtractedFilesProvider> instance = new Lazy<LastExtractedFilesProvider>(() => new LastExtractedFilesProvider(), true);
+
+        private const string AttachmentFileName = "AttData";
+
+        private List<FileInfo> recentlyExtractedAttachment = new List<FileInfo>();
+                
         public static LastExtractedFilesProvider Instance
         {
             get
@@ -37,24 +39,29 @@
             return result;
         }
 
-        public void AddAttachmentToRecentFiles(List<FileInfo> AttFiles)
+        public void AddAttachmentToRecentFiles(List<FileInfo> attachments)
         {
-            foreach (FileInfo addedFile in AttFiles)
+            var isChanged = false;
+            foreach (var attachment in attachments)
             {
-                var result = CheckEqualsFiles(addedFile);
-                if (!addedFile.ExtractedStorageFile.DisplayName.Contains("Message_Body") && result == false)
+                var result = this.CheckEqualsFiles(attachment);
+                if (!attachment.ExtractedStorageFile.DisplayName.Contains("Message_Body") && !result)
                 {
-                    this.recentlyExtractedAttachment.Add(addedFile);
+                    isChanged = true;
+                    this.recentlyExtractedAttachment.Add(attachment);
                 }
             }
 
-            ObjectSerializer.Serialize(this.recentlyExtractedAttachment, AttachmentFileName);
+            if (isChanged)
+            {
+                ObjectSerializer.Serialize(this.recentlyExtractedAttachment, AttachmentFileName);
+            }
         }
 
         private bool CheckEqualsFiles(FileInfo addedFile)
         {
             var result = false;
-            foreach (FileInfo recentFile in this.recentlyExtractedAttachment)
+            foreach (var recentFile in this.recentlyExtractedAttachment)
             {
                 if(recentFile.FilePath.Equals(addedFile.FilePath) && recentFile.SourceFileName.Equals(addedFile.SourceFileName))
                 {

@@ -1,28 +1,27 @@
-﻿using DatMailReader.Helpers.Common;
+﻿using DatMailReader.Shared.Helpers;
 using DatMailReader.ViewModels.ViewModels;
-using System;
+using System.Collections.Generic;
 using Windows.Storage;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
+// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace DatMailReader.View
 {
     /// <summary>
-    /// A basic page that provides characteristics common to most applications.
+    /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class OpenedFilePage : Page
+    public sealed partial class AllRecentDatFiles : Page
     {
         private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        /// <summary>
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
-        public ObservableDictionary DefaultViewModel
+        public AllRecentDatFiles()
         {
-            get { return this.defaultViewModel; }
+            this.InitializeComponent();
+            this.navigationHelper = new NavigationHelper(this);
+            this.navigationHelper.LoadState += navigationHelper_LoadState;
+            this.navigationHelper.SaveState += navigationHelper_SaveState;
         }
 
         /// <summary>
@@ -34,14 +33,6 @@ namespace DatMailReader.View
             get { return this.navigationHelper; }
         }
 
-        public OpenedFilePage()
-        {
-            this.InitializeComponent();
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += navigationHelper_LoadState;
-            this.navigationHelper.SaveState += navigationHelper_SaveState;
-            this.Loaded += OnLoaded;
-        }
 
         /// <summary>
         /// Populates the page with content passed during navigation. Any saved state is also
@@ -56,7 +47,7 @@ namespace DatMailReader.View
         /// session. The state will be null the first time a page is visited.</param>
         private void navigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
-            
+
         }
 
         /// <summary>
@@ -72,12 +63,6 @@ namespace DatMailReader.View
 
         }
 
-        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        { 
-            var detailViewModel = DataContext as DetailViewModel;
-            detailViewModel.Initialize();
-        }
-
         #region NavigationHelper registration
 
         /// The methods provided in this section are simply used to allow
@@ -91,16 +76,16 @@ namespace DatMailReader.View
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.navigationHelper.OnNavigatedTo(e);
-            var detailViewModel = DataContext as DetailViewModel;
-            detailViewModel.RecievedFile = e.Parameter as StorageFile;
+            this.NavigationHelper.OnNavigatedTo(e);
+            var allRecentDatFilesViewModel = DataContext as AllRecentDatFilesViewModel;
+            allRecentDatFilesViewModel.AllDatFiles = e.Parameter as List<StorageFile>;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedFrom(e);
         }
-
+        
         #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace DatMailReader.Helpers.Common
+﻿namespace DatMailReader.Shared.Helpers
 {
     using System;
     using System.Collections.Generic;

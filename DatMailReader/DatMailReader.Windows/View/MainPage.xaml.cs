@@ -1,4 +1,8 @@
-﻿using DatMailReader.ViewModels.ViewModels;
+﻿using DatMailReader.DataAccess.Providers;
+using DatMailReader.Shared.Services;
+using DatMailReader.ViewModels.ViewModels;
+using System.Collections.Generic;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
@@ -14,12 +18,35 @@ namespace DatMailReader.View
         {
             this.InitializeComponent();
             this.Loaded += OnLoaded;
+            this.SizeChanged += OnSizeChanged;
+        }
+
+        private void OnSizeChanged(object sender, Windows.UI.Xaml.SizeChangedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, GetState(e.NewSize.Width), true);
+        }
+
+        private string GetState(double width)
+        {
+            //if (width <= 500)
+            //    return "Snapped";
+
+            //if (width <= 660)
+            //    return "EvenSmaller";
+
+            if (width <= 755)
+                return "Smaller";
+
+            return "Default";
         }
 
         private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        { 
+        {
+            var fileService = FileSelectionService.Instance;
+            fileService.Initialize();
             var viewModel = DataContext as MainViewModel;
             viewModel.Initialize();
+            viewModel.fileOpenService = fileService;
         }
     }
 }

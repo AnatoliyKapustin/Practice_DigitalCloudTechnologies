@@ -1,6 +1,6 @@
 ﻿namespace DatMailReader.DataAccess.Providers
 {
-    using DatMailReader.Helpers.Common;
+    using DatMailReader.DataAccess.Core;
     using MimeKit;
     using MimeKit.IO;
     using MimeKit.IO.Filters;
@@ -8,25 +8,22 @@
     using Models.Model;
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using Windows.Storage;
-    using Windows.Storage.FileProperties;
 
     public class DatParserProvider
     {
-        private static DatParserProvider datParser;
+        private readonly static Lazy<DatParserProvider> instance = new Lazy<DatParserProvider>(() => new DatParserProvider(), true);
         private MimeMessage message;
-        private StorageItemThumbnail thumb;
+        private string thumb;
         private DateTimeOffset date;
         private string size;
         private string from;
         private string fileName;
         private StorageFile bodyFile;
-        private readonly static Lazy<DatParserProvider> instance = new Lazy<DatParserProvider>(() => new DatParserProvider(), true);
-        
+
         public static DatParserProvider Instance
         {
             get
@@ -35,12 +32,12 @@
             }
         }
 
-        public async Task<Message> OpenTnef(StorageFile file, Message targetMessage)
-        {         
+        public async Task<Message> OpenTnef(StorageFile datFile)
+        {
             List<FileInfo> targetFilesCollection = new List<FileInfo>();
-            this.fileName = file.DisplayName;
-            Stream sRead = await WindowsRuntimeStorageExtensions.OpenStreamForReadAsync(file);
-            TnefReader tnefReader = new TnefReader(sRead, 0, TnefComplianceMode.Loose);
+            this.fileName = datFile.DisplayName;
+            Stream sRead = await WindowsRuntimeStorageExtensions.OpenStreamForReadAsync(datFile);
+            TnefReader tnefReader = new TnefReader(sRead);
             this.message = ExtractTnefMessage(tnefReader);
             if (this.message.Sender == null)
             {
@@ -48,12 +45,12 @@
             }
             foreach (MimePart mimePart in this.message.Attachments)
             {
-                StorageFile isoFile = await DatParserProvider.writeFileToIsoStorage(mimePart.FileName, mimePart.ContentObject.Open());
-                BasicProperties basicProperties = await isoFile.GetBasicPropertiesAsync();
-                this.thumb = await isoFile.GetThumbnailAsync(ThumbnailMode.DocumentsView);
+                var isoFile = await DatParserProvider.writeFileToIsoStorage(mimePart.FileName, mimePart.ContentObject.Open());
+                var basicProperties = await isoFile.GetBasicPropertiesAsync();
+                this.thumb = this.GetVectorThumbnailByType(isoFile.FileType);
                 this.date = (DateTimeOffset)mimePart.ContentDisposition.ModificationDate;
                 this.size = FileSizeString((double)basicProperties.Size);
-                this.from = file.Name;
+                this.from = datFile.Name;
                 targetFilesCollection.Add(new FileInfo(isoFile, this.thumb, this.size, this.fileName));
             }
             TextPart body = Enumerable.FirstOrDefault<TextPart>(Enumerable.OfType<TextPart>(message.BodyParts));
@@ -74,20 +71,85 @@
                 }
                 bodyFile = await DatParserProvider.writeFileToIsoStorage(bodyFileName, body.Text);
             }
-            targetMessage = new Message(this.message.Subject, this.message.Sender.ToString(), string.Empty, this.message.Date.ToString(), bodyFile, targetFilesCollection);
+            var targetMessage = new Message(this.message.Subject, this.message.Sender.ToString(), string.Empty, this.message.Date.ToString(), bodyFile, targetFilesCollection);
+
             return targetMessage;
+        }
+
+        private string GetVectorThumbnailByType(string fileType)
+        {
+            var result = default(string);
+            switch (fileType)
+            {
+                case ".rar":
+                    result = "Archive";
+                    break;
+                case ".zip":
+                    result = "Archive";
+                    break;
+                case ".7z":
+                    result = "Archive";
+                    break;
+
+                case ".pdf":
+                    result = "Text-ico";
+                    break;
+                case ".txt":
+                    result = "Text-ico";
+                    break;
+                case ".doc":
+                    result = "Text-ico";
+                    break;
+                case ".docx":
+                    result = "Text-ico";
+                    break;
+                case ".rtf":
+                    result = "Text-ico";
+                    break;
+                case ".odt":
+                    result = "Text-ico";
+                    break;
+                case ".chm":
+                    result = "Text-ico";
+                    break;
+
+                case ".ppt":
+                    result = "Text-ico";
+                    break;
+                case ".pptx":
+                    result = "Text-ico";
+                    break;
+
+                case ".gif":
+                    result = "Pic";
+                    break;
+                case ".jpg":
+                    result = "Pic";
+                    break;
+                case ".png":
+                    result = "Pic";
+                    break;
+                case ".tif":
+                    result = "Pic";
+                    break;
+                default:
+                    result = "Any-file";
+                    break;
+            }
+
+            return result;
         }
 
         private static string FileSizeString(double fileSize)
         {
-            string[] strArray = new string[4]
+            var strArray = new string[4]
             {
                 "B",
                 "KB",
                 "MB",
                 "GB"
             };
-            int index = 0;
+            var index = 0;
             while (fileSize >= 1024.0 && index + 1 < strArray.Length)
             {
                 ++index;
@@ -95,30 +157,25 @@
             }
             return string.Format("{0:0.##} {1}", new object[2]
             {
-                (object) fileSize,
-                (object) strArray[index]
+                 fileSize,
+                 strArray[index]
             });
         }
 
         private static MimeMessage ExtractTnefMessage(TnefReader reader)
         {
-            TnefPropertyReader tnefPropertyReader;
+            var tnefReader = reader.TnefPropertyReader;
             BodyBuilder builder = new BodyBuilder();
             MimeMessage message = new MimeMessage();
-            while (reader.ReadNextAttribute() && reader.AttributeLevel != TnefAttributeLevel.Attachment)
+            while (reader.ReadNextAttribute() && reader.AttributeLevel == TnefAttributeLevel.Message)
             {
-                int num = (int)reader.AttributeLevel;
-                tnefPropertyReader = reader.TnefPropertyReader;
                 switch (reader.AttributeTag)
                 {
                     case TnefAttributeTag.MapiProperties:
                         DatParserProvider.ExtractMapiProperties(reader, message, builder);
                         continue;
-                    case TnefAttributeTag.Body:
-                        builder.TextBody = tnefPropertyReader.ReadValueAsString();
-                        continue;
-                    case TnefAttributeTag.DateSent:
-                        message.Date = (DateTimeOffset)tnefPropertyReader.ReadValueAsDateTime();
+                    case TnefAttributeTag.DateReceived:
+                        message.Date = tnefReader.ReadValueAsDateTime();
                         continue;
                     default:
                         continue;
@@ -336,12 +393,20 @@
 
         private static void test(TnefReader reader, MimeMessage message, BodyBuilder builder)
         {
+            List<string> testList = new List<string>();
+            var v = default(string);
+            var n = Enum.GetNames(typeof(MimeKit.Tnef.TnefPropertyId)).ToList();
+            var array = Enum.GetNames(typeof(Mapi.ID)).ToList();
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            List<TnefPropertyId> text = new List<TnefPropertyId>();
-            List<string> str = new List<string>();
             TnefPropertyReader tnefPropertyReader = reader.TnefPropertyReader;
             while (tnefPropertyReader.ReadNextProperty())
             {
+                foreach (string mapiProperty in array)
+                {
+                    if (mapiProperty.Contains(tnefPropertyReader.PropertyTag.Id.ToString()))
+                        v = tnefPropertyReader.ReadValue().ToString();
+                }
+                testList.Add(v);
                 var a = tnefPropertyReader.PropertyTag.Id;
                 var s = tnefPropertyReader.ReadValue();
                 dictionary.Add(a.ToString(), s.ToString()); ///ConversationTopic 16378 3624 3625 sentMailentryId
@@ -350,7 +415,8 @@
 
         private static void ExtractMapiProperties(TnefReader reader, MimeMessage message, BodyBuilder builder)
         {
-            ///    test(reader, message, builder);
+
+            ///test(reader, message, builder);
             TnefPropertyReader tnefPropertyReader = reader.TnefPropertyReader;
             while (tnefPropertyReader.ReadNextProperty())
             {
@@ -412,25 +478,21 @@
                             continue;
                         }
                         continue;
-                    case TnefPropertyId.ConversationTopic:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
+                    case TnefPropertyId.ConversationTopic:
                         if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
                         {
                             message.Subject = tnefPropertyReader.ReadValueAsString();
                             continue;
                         }
                         continue;
-                    case (TnefPropertyId)Mapi.ID.PR_PRIMARY_SEND_ACCOUNT:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
-                        // if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
-                        //{
-                        MailboxAddress sender = new MailboxAddress(string.Empty, tnefPropertyReader.ReadValueAsString());
+                    case TnefPropertyId.SenderName:
+                        var sender = new MailboxAddress(string.Empty, tnefPropertyReader.ReadValueAsString());
                         message.Sender = sender;
                         continue;
-                    case (TnefPropertyId)Mapi.ID.PR_CLIENT_SUBMIT_TIME:               ///DisplayTo //SenderName DisplayCc ReadReceiptRequested
-                        // if (tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.String8 || tnefPropertyReader.PropertyTag.ValueTnefType == TnefPropertyType.Unicode)
-                        //{
-                        message.Date = tnefPropertyReader.ReadValueAsDateTime();
+                    case (TnefPropertyId)Mapi.ID.PR_PRIMARY_SEND_ACCOUNT:               
+                        var senderEmail = new MailboxAddress(string.Empty, tnefPropertyReader.ReadValueAsString());
+                        message.Sender = senderEmail;
                         continue;
-                    //}
                     default:
                         try
                         {
@@ -444,25 +506,5 @@
                 }
             }
         }
-        /*private static MailboxAddress ParseString(string s)
-        {
-            char[] temp;
-            MailboxAddress resultAddress;
-            string resultString = s;
-            temp = resultString.ToCharArray();
-            for (int i = 0; i < temp.Length; i++)
-            {
-                if (temp[i] == ' ')
-                {
-                    while (temp[i] != ' ')
-                    {
-                        resultString += temp[i];
-                    }
-                }
-            }
-
-            resultAddress = new MailboxAddress("", resultString);
-            return resultAddress;
-        }*/
     }
 }

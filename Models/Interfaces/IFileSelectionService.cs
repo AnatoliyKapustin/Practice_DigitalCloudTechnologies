@@ -1,4 +1,4 @@
-﻿namespace DatMailReader.Services.Shared
+﻿namespace DatMailReader.Models.Interfaces
 {
     using System.Threading.Tasks;
     using Windows.Storage;
@@ -6,7 +6,7 @@
 
     public interface IFileSelectionService
     {
-        void Initialise();
+        void Initialize();
         Task LaunchFileSelectionServiceAsync();
         StorageFile CompleteOutstandingSelectionService();
     }

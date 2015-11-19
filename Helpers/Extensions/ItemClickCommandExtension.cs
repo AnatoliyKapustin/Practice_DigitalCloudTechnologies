@@ -24,18 +24,29 @@
             var control = d as ListViewBase;
             if (control != null)
             {
-                control.ItemClick += OnItemClick;
+                if(e.OldValue != null)
+                {
+                    control.ItemClick -= OnItemClick;
+                }
+
+                if (e.NewValue != null)
+                {
+                    control.ItemClick += OnItemClick;
+                }
             }
         }
 
         private static void OnItemClick(object sender, ItemClickEventArgs e)
         {
             var control = sender as ListViewBase;
-            var command = GetCommand(control);
-            var obj = e.ClickedItem;
-            if (command != null && command.CanExecute(e.ClickedItem))
-            { 
-                command.Execute(e.ClickedItem); 
+            if (control != null)
+            {
+                var command = GetCommand(control);
+                var obj = e.ClickedItem;
+                if (command != null && command.CanExecute(e.ClickedItem))
+                {
+                    command.Execute(e.ClickedItem);
+                }
             }
         }
     }

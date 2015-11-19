@@ -107,17 +107,13 @@
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Mapi.cs" />
-    <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObjectSerializer.cs" />
-    <Compile Include="Common\ObservableDictionary.cs" />
-    <Compile Include="Common\SuspensionManager.cs" />
-    <Compile Include="Converters\BoolToVisiblityConverter.cs" />
-    <Compile Include="Converters\ThumbnailToImageConverter.cs" />
+    <Compile Include="Converters\EmptyToVisiblityConverter.cs" />
+    <Compile Include="Converters\NameToStyleConverter.cs" />
     <Compile Include="Extensions\HTMLToTextExtension.cs" />
     <Compile Include="Extensions\ItemClickCommandExtension.cs" />
     <Compile Include="Extensions\OpenMenuFlyoutActionExtencion.cs" />
-    <Compile Include="Extensions\RtfToTextExtencion.cs" />
+    <Compile Include="Extensions\RtfToTextExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
