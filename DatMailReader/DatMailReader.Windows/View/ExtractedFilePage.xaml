@@ -8,22 +8,22 @@
     xmlns:converters="using:DatMailReader.Helpers.Converters"
     xmlns:local="using:DatMailReader.Helpers.Extensions"
     xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
+    xmlns:templateSelector="using:DatMailReader.Helpers.TemplateSelectors"
     xmlns:common="using:DatMailReader.Helpers.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
     <Page.Resources>
-        <vm:ExtractedFileViewModel x:Key="ExtractedFileViewModel"/>
+        <vm:ExtractedFilesViewModel x:Key="ExtractedFilesViewModel"/>
         <converters:EmptyToVisibilityConverter x:Key="EmptyToVisiblityConverter"/>
-        <converters:NameToStyleConverter x:Key="NameToStyleConverter"/>
     </Page.Resources>
 
     <Page.DataContext>
-        <Binding Source="{StaticResource ExtractedFileViewModel}"/>
+        <Binding Source="{StaticResource ExtractedFilesViewModel}"/>
     </Page.DataContext>
 
-    <Grid Background="#FFE4F1F9">
+    <Grid Background="#FFDDE7F3">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
@@ -32,25 +32,22 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Button
-            Margin="45 0 0 0"
-            Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
-            Style="{StaticResource RoundedButton}"
-            Content="&#xe112;"            
-            HorizontalAlignment="Center"
-            FontSize="40"/>
-        <TextBlock 
-            Style="{StaticResource SubjectTextBlockStyle}"
-            Text="{Binding ExtractedMessage.Subject}" 
-            Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
-            Grid.Column="1"/>
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Button x:Name="BackButton"
+                Style="{StaticResource BackButton}" 
+                Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"/>
+        <TextBlock Style="{StaticResource SubjectTextBlockStyle}"
+                   Text="{Binding ExtractedMessage.Subject}" 
+                   Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+                   Grid.Column="1"/>
+        <Grid Grid.Row="1"
+              Grid.ColumnSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid>
+            <Grid x:Name="MessageInforamationGrid"
+                  Margin="120,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -61,32 +58,27 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Style="{StaticResource TextBlockMessageSenderInformation}"
-                        Text="From:"/>
-                    <TextBlock
-                        Style="{StaticResource TextBlockMessageSenderInformation}" 
-                        Text="{Binding ExtractedMessage.Sender}"
-                        Grid.Column="1"/>
+                    <TextBlock Style="{StaticResource TextBlockMessageSenderInformation}"
+                               Text="From:"/>
+                    <TextBlock Style="{StaticResource TextBlockMessageSenderInformation}" 
+                               Text="{Binding ExtractedMessage.Sender}"
+                               Grid.Column="1"/>
                 </Grid>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Style="{StaticResource TextBlockMessageSenderInformation}"
-                        Text="To:"/>
-                    <TextBlock 
-                        Style="{StaticResource TextBlockMessageSenderInformation}"
-                        Text="{Binding ExtractedMessage.To}"
-                        Grid.Column="1"/>
+                    <TextBlock Style="{StaticResource TextBlockMessageSenderInformation}"
+                               Text="To:"/>
+                    <TextBlock Style="{StaticResource TextBlockMessageSenderInformation}"
+                               Text="{Binding ExtractedMessage.To}"
+                               Grid.Column="1"/>
                 </Grid>
-                <TextBlock
-                    Style="{StaticResource TextBlockMessageSenderInformation}"
-                    Text="Date"
-                    Margin="0 0 0 36"
-                    Grid.Row="2"/>
+                <TextBlock Style="{StaticResource TextBlockMessageSenderInformation}"
+                           Text="Date"
+                           Margin="0,0,0,36"
+                           Grid.Row="2"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.RowDefinitions>
@@ -98,77 +90,71 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock 
-                            Style="{StaticResource RecentFilesTextBlockStyle}" 
-                            Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
-                            Text="Attachments" 
-                            FontSize="30"/>
-                    <Button
-                        Content="&#xe105;" 
-                        Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}"     
-                        Margin="24 0 0 0"
-                        FontSize="30"
-                        HorizontalAlignment="Center"
-                        Command="{Binding SaveAllCommand}" 
-                        Style="{StaticResource RoundedButton}"
-                        Grid.Column="1"/>
+                    <TextBlock x:Name="AttachmentTextBlock"
+                               Style="{StaticResource RecentFilesTextBlockStyle}" 
+                               Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+                               Text="Attachments" 
+                               FontSize="30"
+                               Margin="120,0,0,0"/>
+                    <Button Template="{StaticResource RoundButtonControlTemplate}"
+                            Content="&#xe105;" 
+                            Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}"                                
+                            Command="{Binding SaveAllCommand}" 
+                            Style="{StaticResource RoundedButton}"
+                            Grid.Column="1"/>
                 </Grid>
-                <GridView
-                    Grid.Row="1" 
-                    Margin="0 24 0 48"
-                    ItemsSource="{Binding ExtractedFilesFromMessage}" 
-                    Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
-                    SelectionMode="None"
-                    IsItemClickEnabled="True"
-                    local:ItemClickCommandExtension.Command="{Binding MyItemClickCommand}">
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid
-                                Width="310" 
-                                Height="90"
-                                Background="#0090ff"
-                                Margin="0 0 12 0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ContentControl
-                                    Style="{Binding Thumbnail, Converter={StaticResource NameToStyleConverter}}"/>
-                                <Grid
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock
-                                        Style="{StaticResource GridViewTextBlockStyle}"
-                                        Text="{Binding DisplayName}"/>
-                                    <TextBlock 
-                                        Style="{StaticResource GridViewFromTextBox}"
-                                        Text="{Binding Size}" 
-                                        Grid.Row="1"/>
-                                </Grid>
-                            </Grid>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsStackPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
+                <GridView x:Name="ExtractedFiles"
+                          ItemsSource="{Binding ExtractedMessage.Files}"
+                          ItemsPanel="{StaticResource HorizontalStackPanel}"
+                          ItemTemplateSelector="{StaticResource FileIconSelector}"
+                          Style="{StaticResource HorizontalGridViewWithFilesStyle}"
+                          Visibility="{Binding ExtractedMessage.Files, Converter={StaticResource EmptyToVisiblityConverter}}" 
+                          local:ItemClickCommandExtension.Command="{Binding ItemClickCommand}"
+                          Grid.Row="1">
                 </GridView>
             </Grid>
-            <Grid Grid.Row="2">
-                <WebView
-                    local:HTMLToTextExtension.HTMLText="{Binding HTMLMessage}"/>
-                <RichEditBox
-                    FontSize="18"
-                    FontWeight="Normal"
-                    local:RtfTextExtension.RichText="{Binding RtfString}" 
-                    BorderBrush="{x:Null}" 
-                    Background="{x:Null}"/>
+            <Grid x:Name="MessageGrid"
+                  Grid.Row="2"
+                  Margin="120,0,0,0">
+                <WebView local:HTMLToTextExtension.HTMLText="{Binding HTMLMessage}"/>
+                <RichEditBox FontSize="18"
+                             FontWeight="Normal"
+                             Padding="0,0,0,10"
+                             local:RtfTextExtension.RichText="{Binding RtfString}" 
+                             BorderBrush="{x:Null}" 
+                             Background="{x:Null}"/>
             </Grid>
         </Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="Snapped">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MessageInforamationGrid" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24,0,24,0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MessageGrid" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24,0,0,0"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="BackButton" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24"/>
+                        </ObjectAnimationUsingKeyFrames>
+                        
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AttachmentTextBlock" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24,0,0,0"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ExtractedFiles" Storyboard.TargetProperty="Padding">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24,0,24,10"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ExtractedFiles" Storyboard.TargetProperty="ItemTemplateSelector">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource VerticalFileIconSelector}"/>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
     </Grid>
 </Page>

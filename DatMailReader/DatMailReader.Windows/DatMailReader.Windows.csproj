@@ -104,11 +104,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="View\AllExtractedAttachments.xaml.cs">
-      <DependentUpon>AllExtractedAttachments.xaml</DependentUpon>
+    <Compile Include="View\ExtractedAttachments.xaml.cs">
+      <DependentUpon>ExtractedAttachments.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\AllRecentDatFiles.xaml.cs">
-      <DependentUpon>AllRecentDatFiles.xaml</DependentUpon>
+    <Compile Include="View\RecentDatFiles.xaml.cs">
+      <DependentUpon>RecentDatFiles.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ExtractedFilePage.xaml.cs">
       <DependentUpon>ExtractedFilePage.xaml</DependentUpon>
@@ -125,19 +125,23 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\e105-Save.48 %281%29.png" />
-    <Content Include="Assets\e105-Save.48.png" />
     <Content Include="Assets\Logo.scale-100.png" />
     <Content Include="Assets\SmallLogo.scale-100.png" />
     <Content Include="Assets\SplashScreen.scale-100.png" />
     <Content Include="Assets\StoreLogo.scale-100.png" />
+    <Content Include="Assets\Background.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="View\AllExtractedAttachments.xaml">
+    <Page Include="Styles\Style.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="View\ExtractedAttachments.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\AllRecentDatFiles.xaml">
+    <Page Include="View\RecentDatFiles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

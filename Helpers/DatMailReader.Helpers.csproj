@@ -107,14 +107,15 @@
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\ObjectSerializer.cs" />
-    <Compile Include="Converters\EmptyToVisiblityConverter.cs" />
-    <Compile Include="Converters\NameToStyleConverter.cs" />
+    <Compile Include="Converters\BoolToVisiblityConverter.cs" />
+    <Compile Include="Converters\EmptyToVisibilityConverter.cs" />
     <Compile Include="Extensions\HTMLToTextExtension.cs" />
     <Compile Include="Extensions\ItemClickCommandExtension.cs" />
-    <Compile Include="Extensions\OpenMenuFlyoutActionExtencion.cs" />
     <Compile Include="Extensions\RtfToTextExtension.cs" />
+    <Compile Include="Extensions\TextBlockNavigationClickExtension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TemplateSelectors\FileIconSelector.cs" />
+    <Compile Include="TemplateSelectors\VerticalOrientationIconSelector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight">

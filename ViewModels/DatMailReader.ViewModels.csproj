@@ -108,10 +108,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\AllExtractedAttachmentsViewModel.cs" />
-    <Compile Include="ViewModels\AllRecentDatFilesViewModel.cs" />
-    <Compile Include="ViewModels\ExtractedFileViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\ExtractedAttachmentsViewModel.cs" />
+    <Compile Include="ViewModels\RecentDatFilesViewModel.cs" />
+    <Compile Include="ViewModels\ExtractedFilesViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs">
+      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
+    </Compile>
     <Compile Include="ViewModels\ViewModelLocatorPCL.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -3,14 +3,17 @@
     using DatMailReader.Models.Interfaces;
     using System;
     using System.Threading.Tasks;
+    using Windows.ApplicationModel.Activation;
+    using Windows.ApplicationModel.Core;
     using Windows.Storage;
     using Windows.Storage.Pickers;
 
     public class FileSelectionService : IFileSelectionService
     {
+        private readonly static Lazy<FileSelectionService> instance = new Lazy<FileSelectionService>(() => new FileSelectionService(), true);
         private TaskCompletionSource<int> completionSource;
         private StorageFile storageFile;
-        private readonly static Lazy<FileSelectionService> instance = new Lazy<FileSelectionService>(() => new FileSelectionService(), true);
+        
         public static FileSelectionService Instance
         {
             get

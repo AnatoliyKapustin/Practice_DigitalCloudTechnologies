@@ -1,5 +1,6 @@
 ﻿namespace DatMailReader.Models.Model
 {
+    using DatMailReader.Models.Enums;
     using System;
     using System.Runtime.Serialization;
     using Windows.Storage;
@@ -9,12 +10,12 @@
     [DataContract]
     public class FileInfo
     {
-        public FileInfo(StorageFile file, string thumb, string size, string fileName)
+        public FileInfo(StorageFile file, ImageStyles thumb, string size, string fileName)
         {
             this.ExtractedStorageFile = file;
             this.DisplayName = file.DisplayName;
             this.DisplayType = file.DisplayType;
-            this.Thumbnail = System.Text.RegularExpressions.Regex.Unescape(thumb);
+            this.Thumbnail = thumb;
             this.Size = size;
             this.SourceFileName = fileName;
             this.FilePath = file.Path;
@@ -35,7 +36,7 @@
         public string Size { get; set; }
 
         [DataMember]
-        public string Thumbnail { get; set; }
+        public ImageStyles Thumbnail { get; set; }
 
         [DataMember]
         public string SourceFileName { get; set; }

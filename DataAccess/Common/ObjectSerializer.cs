@@ -1,4 +1,4 @@
-﻿namespace DatMailReader.Helpers.Common
+﻿namespace DatMailReader.DataAccess.Common
 {
     using System;
     using System.Collections.ObjectModel;

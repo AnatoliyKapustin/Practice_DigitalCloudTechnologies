@@ -1,11 +1,12 @@
 ﻿namespace DatMailReader.Helpers.Providers
 {
+    using DatMailReader.DataAccess.Common;
     using DatMailReader.Models.Model;
-    using Helpers.Common;
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
+    using System.IO;
     using System.Threading.Tasks;
+    using Windows.Storage;
 
     public class LastExtractedFilesProvider
     {
@@ -23,7 +24,7 @@
             }
         }
 
-        public async Task<List<FileInfo>> GetAttFiles()
+        public async Task<List<FileInfo>> GetAttachmentFiles()
         {
             var result = new List<FileInfo>(this.recentlyExtractedAttachment);
             if (this.recentlyExtractedAttachment.Count == 0)
@@ -37,6 +38,12 @@
             }
 
             return result;
+        }
+
+        public void ClearLastAttachmentsCollection()
+        {
+            this.recentlyExtractedAttachment.Clear();
+            ObjectSerializer.Serialize(this.recentlyExtractedAttachment, AttachmentFileName);
         }
 
         public void AddAttachmentToRecentFiles(List<FileInfo> attachments)
@@ -71,5 +78,39 @@
 
             return result;
         }
+
+        public static async Task<StorageFile> WriteFileToIsoStorage(string fileName, Stream content)
+        {
+            var file = await CreateFileInLocalStorage(fileName);
+            using (var stream = await file.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                await content.CopyToAsync(stream.AsStream());
+            }
+
+            //using (var memoryStream = new MemoryStream())
+            //{
+            //    content.CopyTo(memoryStream);
+            //    await FileIO.WriteBytesAsync(file, memoryStream.ToArray());
+            //}
+
+            return file;
+        }
+
+        public static async Task<StorageFile> WriteFileToIsoStorage(string fileName, string content)
+        {
+            var file = await CreateFileInLocalStorage(fileName);
+            await FileIO.WriteTextAsync(file, content);
+
+            return file;
+        }
+
+        private static async Task<StorageFile> CreateFileInLocalStorage(string fileName)
+        {
+            var localFolder = ApplicationData.Current.LocalFolder;
+            fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
+            var localFile = await localFolder.CreateFileAsync(fileName, CreationCollisionOption.OpenIfExists);
+
+            return localFile;
+        } 
     }
 }

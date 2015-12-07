@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:DatMailReader.Helpers.Extensions"
     xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
+    xmlns:converters="using:DatMailReader.Helpers.Converters"
     xmlns:common="using:DatMailReader.Helpers.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -16,125 +17,65 @@
     <Page.DataContext>
         <Binding Source="{StaticResource MainViewModel}" />
     </Page.DataContext>
+
     <Page.BottomAppBar>
-        <CommandBar 
-            Height="Auto">
-            <AppBarButton 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center" 
-                Icon="Delete"/>
+        <CommandBar Background="#0090ff">
+            <AppBarButton HorizontalAlignment="Center" 
+                          VerticalAlignment="Center" 
+                          Icon="Delete"/>
         </CommandBar>
     </Page.BottomAppBar>
-    <Grid Background="#FFDDE7F3">
-        <Pivot 
-            Title="WINMAIL.DAT VIEWER" 
-            Foreground="Gray">
-            <PivotItem 
-                Header="Extract" 
-                Foreground="Black" 
-                Background="{x:Null}">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Background.jpg"/>
+        </Grid.Background>
+        <Pivot Margin="0,20,0,0"
+               TitleTemplate="{StaticResource PivotTitleContentTemplate}">
+            <PivotItem HorizontalAlignment="Center"
+                       Header="Extract" 
+                       Foreground="Black" 
+                       Background="{x:Null}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Button 
-                        Content="&#xE105; extract new"
-                        Style="{StaticResource RectangleButtonWindowsPhone}"
-                        Width="350"
-                        Height="80"        
-                        BorderBrush="{x:Null}" 
-                        Command="{Binding OpenFileCommand}">
+                    <Button Style="{StaticResource RectangleButtonWP}"
+                            Template="{StaticResource OpenFileButtonTemplate}"
+                            ContentTemplate="{StaticResource OpenFileButtonIcon}"
+                            Content="Extract new"
+                            Margin="0,0,0,34"
+                            Command="{Binding OpenFileCommand}">
                     </Button>
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Row="1"
+                          Margin="0,0,0,15">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBlock 
-                            Text="recently extracted" 
-                            Margin="10,0,0,0" 
-                            FontSize="18" 
-                            Foreground="#FF3BA3F9"/>
-                        <ListView 
-                            ItemsSource="{Binding RecentlyExtractedFiles}" 
-                            local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
-                            IsItemClickEnabled="True" 
-                            Grid.Row="1"
-                            HorizontalAlignment="Center" 
-                            VerticalAlignment="Center">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid 
-                                        Width="350" 
-                                        Height="80" 
-                                        Background="#FF3BA3F9">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="Auto"/>
-                                        </Grid.RowDefinitions>
-                                        <TextBlock 
-                                            Padding="10,10,0,0" 
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Left"
-                                            Foreground="White"
-                                            TextWrapping="WrapWholeWords" 
-                                            Text="{Binding DisplayName}"/>
-                                        <TextBlock 
-                                            Padding="10,10,0,0" 
-                                            VerticalAlignment="Center"
-                                            HorizontalAlignment="Left"
-                                            TextWrapping="WrapWholeWords" 
-                                            Text="{Binding From}"
-                                            Grid.Row="1"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                            <ListView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <ItemsWrapGrid Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ListView.ItemsPanel>
-                        </ListView>
+                        <TextBlock Style="{StaticResource RecentFilesTextBlockStyle}"
+                                   Text="recently extracted"/>
+                        <ListView ItemsSource="{Binding RecentlyExtractedFiles}" 
+                                  local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
+                                  ItemsPanel="{StaticResource HorizontalItemsWrapGrid}"
+                                  ItemTemplate="{StaticResource ListViewWithFiles}"
+                                  Style="{StaticResource ListViewWithFilesStyle}"
+                                  Grid.Row="1"/>
                     </Grid>
                 </Grid>
             </PivotItem>
-            <PivotItem Header="Attached">
-                <Grid>
+            <PivotItem Header="Attached"         
+                       Background="{x:Null}">
+                <Grid Margin="0,0,0,15">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <ListView 
-                        ItemsSource="{Binding RecentlyExtractedAtt}" 
-                        IsItemClickEnabled="True" 
-                        SelectionMode="Multiple">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <TextBlock 
-                                        Margin="0,10,0,0" 
-                                        VerticalAlignment="Center" 
-                                        HorizontalAlignment="Left"
-                                        TextWrapping="WrapWholeWords" 
-                                        Text="{Binding DisplayName}"/>
-                                    <TextBlock 
-                                        Margin="0,10,0,0" 
-                                        VerticalAlignment="Center" 
-                                        TextWrapping="WrapWholeWords" 
-                                        Text="{Binding SourceFileName}"
-                                        Grid.Row="1"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsWrapGrid Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
+                    <ListView ItemTemplateSelector="{StaticResource FileIconSelector}"
+                              ItemsSource="{Binding RecentlyExtractedAttachments}" 
+                              IsItemClickEnabled="True"
+                              SelectionMode="Multiple"
+                              IsRightTapEnabled="True" 
+                              ItemsPanel="{StaticResource HorizontalItemsWrapGrid}">
                     </ListView>
                 </Grid>
             </PivotItem>

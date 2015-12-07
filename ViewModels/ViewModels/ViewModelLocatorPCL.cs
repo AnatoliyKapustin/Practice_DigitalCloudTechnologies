@@ -16,9 +16,6 @@
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
         }
 
-        /// <summary>
-        /// Cleans up all the resources.
-        /// </summary>
         public static void Cleanup()
         {
         }

@@ -2,6 +2,8 @@
     x:Class="DatMailReader.View.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="using:Microsoft.Xaml.Interactivity" 
+    xmlns:tcore="using:Microsoft.Xaml.Interactions.Core"
     xmlns:vm="using:DatMailReader.ViewModels.ViewModels"
     xmlns:common="using:DatMailReader.Helpers.Common"
     xmlns:local="using:DatMailReader.Helpers.Extensions"
@@ -13,184 +15,197 @@
 
     <Page.Resources>
         <vm:MainViewModel x:Key="MainViewModel"/>
-        <converters:NameToStyleConverter x:Key="NameToStyleConverter"/>
     </Page.Resources>
 
     <Page.DataContext>
         <Binding Source="{StaticResource MainViewModel}"/>
     </Page.DataContext>
 
-    <Grid Background="#FFDDE7F3">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Background.jpg"/>
+        </Grid.Background>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="*" x:Name="ButtonRow"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" x:Name="AttachmentsRow"/>
         </Grid.RowDefinitions>
-
-        <Button Style="{StaticResource RectangleButton}"
+        <Button x:Name="OpenNewFileButton"
+                Style="{StaticResource RectangleButton}"
+                Template="{StaticResource RectangleOpenFileButton}"
+                ContentTemplate="{StaticResource MainRectangleButtonIcon}"
                 Content="extract"
                 Command="{Binding OpenFileCommand}" 
                 Height="130"
                 Width="470">
         </Button>
-        <Grid 
-            Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid
                 x:Name="RecentDatFilesTextblockAndAllFilesBtn"
-                Margin="120 0 0 0">
+                Margin="120,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock 
-                    Style="{StaticResource RecentFilesTextBlockStyle}"
-                    Margin="0"
-                    Text="recently extracted"/>
-                <Button  
-                    Content="&#xe106;"
-                    Style="{StaticResource XButton}"
-                    Command="{Binding GotoAllDatFilesPageCommand}"
-                    Grid.Column="1"/>
+                <TextBlock x:Name="RecentDatFilesTextBlock"
+                           local:TextBlockNavigationClickExtension.Command="{Binding GotoAllDatFilesPageCommand}"             
+                           Style="{StaticResource RecentFilesTextBlockStyle}"
+                           Text="recently extracted">
+                <i:Interaction.Behaviors>
+                        <tcore:EventTriggerBehavior EventName="PointerEntered">
+                            <tcore:ChangePropertyAction PropertyName="Foreground" 
+                                                        Value="Red"/>
+                        </tcore:EventTriggerBehavior>
+                        <tcore:EventTriggerBehavior EventName="PointerExited">
+                            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                                        Value="#0090ff"/>
+                        </tcore:EventTriggerBehavior>
+                        <tcore:EventTriggerBehavior EventName="PointerPressed">
+                            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                                        Value="DarkBlue"/>
+                        </tcore:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
+                <Button  x:Name="XButton"
+                         Command="{Binding ClearLastDatFilesButtonClickCommand}"
+                         Template="{StaticResource XButtonContent}"
+                         Content="&#xe106;"
+                         Style="{StaticResource XButton}"
+                         Grid.Column="1"/>
             </Grid>
-            <GridView 
-                    x:Name="RecentExtractedDatFiles"
-                    ItemsSource="{Binding RecentlyExtractedFiles}" 
-                    SelectionMode="None" 
-                    IsItemClickEnabled="True"
-                    Margin="120,24,0,54"
-                    local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
-                    Grid.Row="1">
-                <GridView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid
-                            Background="#0090ff" 
-                            Width="310" 
-                            Height="90"
-                            Margin="0 0 12 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <ContentControl                   
-                                Style="{StaticResource MailIcon}"/>
-                            <TextBlock
-                                Style="{StaticResource GridViewTextBlockStyle}"
-                                Text="{Binding DisplayName}"
-                                Grid.Column="1"/>
-                        </Grid>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-                <GridView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ItemsStackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </GridView.ItemsPanel>
+            <GridView x:Name="RecentExtractedDatFiles" 
+                      ItemsSource="{Binding RecentlyExtractedFiles}" 
+                      ItemsPanel="{StaticResource HorizontalStackPanel}"
+                      ItemTemplate="{StaticResource GridViewWithDatFiles}"
+                      Style="{StaticResource HorizontalGridViewWithFilesStyle}"
+                      local:ItemClickCommandExtension.Command="{Binding RecentlyOpenedMailClickCommand}" 
+                      Grid.Row="1">
             </GridView>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid
                 x:Name="RecentExtractedFilesTextBlockAndAllFilesBtn"
-                Margin="120 0 0 0">
+                Margin="120,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock 
+                    local:TextBlockNavigationClickExtension.Command="{Binding GoToAllAttachmentsPageCommand}"
                     Style="{StaticResource RecentFilesTextBlockStyle}"
-                    Text="extracted attachments"/>
+                    Text="extracted attachments">
+                    <i:Interaction.Behaviors>
+                        <tcore:EventTriggerBehavior EventName="PointerEntered">
+                            <tcore:ChangePropertyAction PropertyName="Foreground" 
+                                                        Value="Red"/>
+                        </tcore:EventTriggerBehavior>
+                        <tcore:EventTriggerBehavior EventName="PointerExited">
+                            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                                        Value="#0090ff"/>
+                        </tcore:EventTriggerBehavior>
+                        <tcore:EventTriggerBehavior EventName="PointerPressed">
+                            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                                        Value="DarkBlue"/>
+                        </tcore:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                </TextBlock>
                 <Button 
+                    Command="{Binding ClearLastAttachmentsButtonClickCommand}"
+                    Template="{StaticResource XButtonContent}"
                     Style="{StaticResource XButton}"
-                    Command="{Binding GoToAllAttachmentsPageCommand}"
                     Content="&#xE106;"
                     Grid.Column="1"/>
             </Grid>
-            <GridView 
-                x:Name="RecentExtractedFiles"
-                ItemsSource="{Binding RecentlyExtractedAttachments}" 
-                SelectionMode="None" 
-                IsItemClickEnabled="True" 
-                Grid.Row="1" 
-                Margin="120,24,0,54"
-                local:ItemClickCommandExtension.Command="{Binding ExtractedItemClickCommand}">
-                <GridView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid 
-                            Background="#0090ff" 
-                            Width="310" 
-                            Height="90"
-                            Margin="0 0 12 0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <ContentControl
-                                 Style="{Binding Thumbnail, Converter={StaticResource NameToStyleConverter}}"/>
-                            <Grid 
-                                VerticalAlignment="Center"
-                                Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock 
-                                    Style="{StaticResource GridViewTextBlockStyle}"
-                                    Text="{Binding DisplayName}"/>
-                                <TextBlock 
-                                    Style="{StaticResource GridViewFromTextBox}"
-                                    Text="{Binding SourceFileName}"
-                                    Grid.Row="1"/>
-                            </Grid>
-                        </Grid>
-                    </DataTemplate>
-                </GridView.ItemTemplate>
-                <GridView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <ItemsStackPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </GridView.ItemsPanel>
+            <GridView x:Name="RecentExtractedFiles"  
+                      ItemsSource="{Binding RecentlyExtractedAttachments}" 
+                      ItemsPanel="{StaticResource HorizontalStackPanel}" 
+                      ItemTemplateSelector="{StaticResource FileIconSelector}"
+                      Style="{StaticResource HorizontalGridViewWithFilesStyle}" 
+                      local:ItemClickCommandExtension.Command="{Binding ExtractedItemClickCommand}"
+                      Grid.Row="1">
             </GridView>
         </Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
-                <VisualState x:Name="Smaller">
+                <VisualState x:Name="Snapped">
                     <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedDatFiles">
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RecentExtractedDatFiles" Storyboard.TargetProperty="(FramewokElement.Visibility)">
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10 0 0 0</Thickness>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RecentDatFilesTextBlock" Storyboard.TargetProperty="(FramewokElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="XButton" Storyboard.TargetProperty="(FramewokElement.Visibility)">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Collapsed</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RecentExtractedFiles" Storyboard.TargetProperty="ItemTemplateSelector">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource VerticalFileIconSelector}"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RecentExtractedFiles" Storyboard.TargetProperty="Style">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource VerticalGridViewWithFilesStyle}"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="RecentExtractedFiles" Storyboard.TargetProperty="ItemsPanel">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource VerticalStackPanel}"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ButtonRow" Storyboard.TargetProperty="Height">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="Auto"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="AttachmentsRow" Storyboard.TargetProperty="Height">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="*"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="OpenNewFileButton" Storyboard.TargetProperty="Margin">
+                            <DiscreteObjectKeyFrame KeyTime="0" Value="24"/>
+                        </ObjectAnimationUsingKeyFrames>
+
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Padding)" Storyboard.TargetName="RecentExtractedFiles">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0,0,24,0</Thickness>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedFiles">
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10 0 0 0</Thickness>
-                                </DiscreteObjectKeyFrame.Value>
-                            </DiscreteObjectKeyFrame>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentDatFilesTextblockAndAllFilesBtn">
-                            <DiscreteObjectKeyFrame KeyTime="0">
-                                <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10 0 0 0</Thickness>
+                                    <Thickness>21,0,0,0</Thickness>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
                         <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FramewokElement.Margin)" Storyboard.TargetName="RecentExtractedFilesTextBlockAndAllFilesBtn">
                             <DiscreteObjectKeyFrame KeyTime="0">
                                 <DiscreteObjectKeyFrame.Value>
-                                    <Thickness>10 0 0 0</Thickness>
+                                    <Thickness>24,0,0,0</Thickness>
                                 </DiscreteObjectKeyFrame.Value>
                             </DiscreteObjectKeyFrame>
                         </ObjectAnimationUsingKeyFrames>
-
                     </Storyboard>
                 </VisualState>
                 <VisualState x:Name="Default"/>

@@ -1,0 +1,793 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:i="using:Microsoft.Xaml.Interactivity" 
+    xmlns:tcore="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:converters="using:DatMailReader.Helpers.Converters">
+
+    <Style x:Key="RecentFilesTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#0090ff"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+        <Setter Property="FontSize" Value="24"/>
+    </Style>
+    
+    <i:BehaviorCollection x:Key="TextBlockBehaviors">
+        <tcore:EventTriggerBehavior EventName="PointerEntered">
+            <tcore:ChangePropertyAction PropertyName="Foreground" 
+                                        Value="Red"/>
+        </tcore:EventTriggerBehavior>
+        <tcore:EventTriggerBehavior EventName="PointerExited">
+            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                        Value="#0090ff"/>
+        </tcore:EventTriggerBehavior>
+        <tcore:EventTriggerBehavior EventName="PointerPressed">
+            <tcore:ChangePropertyAction PropertyName="Foreground"
+                                        Value="DarkBlue"/>
+        </tcore:EventTriggerBehavior>
+    </i:BehaviorCollection>
+    
+    <Style x:Key="GridViewVectorImageStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="24,0,24,0"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="21"/>
+        <Setter Property="SelectionHighlightColor" Value="{x:Null}"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+    </Style>
+
+    <Style x:Key="GridViewTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="21"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+    </Style>
+
+    <Style x:Key="GridViewFromTextBox" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+    </Style>
+
+    <Style x:Key="TextBlockMessageSenderInformation" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,0,18,18"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+        <Setter Property="Foreground" Value="#737373"/>
+        <Setter Property="FontSize" Value="18"/>
+    </Style>
+
+    <Style x:Key="SubjectTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Margin" Value="-3,0,0,0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="#0090ff"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="FontSize" Value="45"/>
+    </Style>
+
+    <DataTemplate x:Key="MailIconContentControl">
+        <Path
+            Width="56"
+            Height="44"
+            Stretch="Uniform" 
+            Fill="White" 
+            Data="M 260,144.747L 260,174.667L 204,174.667L 204,144.747L 232,130.667L 260,144.747 Z M 259.125,144.747L 205.75,144.747L 226.75,156.187L 212.75,168.507L 259.125,144.747 Z"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="MainRectangleButtonIcon">
+        <Path
+            Width="80" Height="50" 
+            Stretch="Fill"
+            Fill="White" 
+            Data="F1 M 128.943,124.71C 100.792,122.922 96.9425,134.308 96.9425,134.308C 96.9425,134.308 84.631,145.924 93.4951,168.975L 22.6666,168.975L 22.6666,110.285L 77.1378,82.6666L 128.943,110.285L 26.071,110.285L 66.9245,132.726L 39.6889,156.892L 128.943,110.784L 128.943,124.71 Z M 98.4096,141.136C 99.7007,139.008 101.315,137.139 103.251,135.531C 105.188,133.922 107.44,132.649 110.005,131.71C 112.571,130.772 115.393,130.303 118.472,130.303L 134.313,130.303L 134.313,110.797L 158.05,134.827L 134.313,162.879L 134.313,142.82L 118.472,142.82C 117.479,142.82 116.395,142.938 115.219,143.172C 114.044,143.407 112.894,143.709 111.768,144.077C 110.643,144.446 109.616,144.873 108.689,145.359C 107.762,145.845 107.067,146.339 106.603,146.842C 105.544,147.982 104.75,149.364 104.22,150.989C 103.69,152.615 103.425,154.383 103.425,156.293C 103.425,157.869 103.607,159.485 103.971,161.144C 104.336,162.803 104.899,164.445 105.66,166.071C 106.422,167.697 107.373,169.263 108.515,170.771C 109.657,172.279 111.007,173.653 112.562,174.893C 109.65,174.893 107.1,174.256 104.915,172.983C 102.73,171.709 100.917,170.042 99.4771,167.981C 98.0371,165.92 96.9617,163.6 96.2493,161.018C 95.5378,158.438 95.1816,155.858 95.1816,153.277C 95.1816,151.501 95.364,149.691 95.7279,147.847C 96.2246,145.502 97.1183,143.265 98.4096,141.136 Z"/>
+    </DataTemplate>
+
+    <ControlTemplate x:Key="RectangleOpenFileButton" TargetType="Button">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ContentPresenter
+                Name="Icon"
+                Margin="0 0 24 0"
+                Content="{TemplateBinding ContentTemplate}" 
+                VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                HorizontalAlignment="Right"
+                Canvas.ZIndex="1"/>
+            <TextBlock
+                Name="Content"
+                Text="{TemplateBinding Content}"
+                FontSize="{TemplateBinding FontSize}"
+                Foreground="{TemplateBinding Foreground}" 
+                VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                HorizontalAlignment="Left"
+                FontWeight="Light"
+                Canvas.ZIndex="1"
+                Grid.Column="1"/>
+            <Rectangle
+                Name="Rectangle" 
+                Fill="{TemplateBinding Background}" 
+                Height="{TemplateBinding Height}" 
+                Width="{TemplateBinding Width}"
+                Grid.ColumnSpan="2"/>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <PointerDownThemeAnimation TargetName="Icon"/>
+                            <PointerDownThemeAnimation TargetName="Rectangle"/>
+                            <PointerDownThemeAnimation TargetName="Content"/>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Key="RectangleButton" TargetType="Button">
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="#0090ff"/>
+        <Setter Property="FontSize" Value="56"/>
+        <Setter Property="FontWeight" Value="Light"/>
+    </Style>
+
+    <Style x:Key="XButton" TargetType="Button">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="#FF3BA3F9"/>
+        <Setter Property="Margin" Value="18,0,0,0"/>
+        <Setter Property="Background" Value="{x:Null}"/>
+    </Style>
+
+    <ControlTemplate x:Key="XButtonContent" TargetType="Button">
+        <Grid>
+            <FontIcon 
+                Name="Icon" 
+                Glyph="{TemplateBinding Content}" 
+                Foreground="{TemplateBinding Foreground}" 
+                HorizontalAlignment="{TemplateBinding HorizontalAlignment}" 
+                VerticalAlignment="{TemplateBinding VerticalAlignment}" 
+                FontSize="{TemplateBinding FontSize}" 
+                Canvas.ZIndex="1"/>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="PointerOver">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Foreground" 
+                                            Storyboard.TargetName="Icon">
+                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0" 
+                                                Value="Red"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Foreground" 
+                                            Storyboard.TargetName="Icon">
+                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0" 
+                                                Value="DarkBlue"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Grid>
+    </ControlTemplate>
+
+    <Style x:Name="HorizontalGridViewWithFilesStyle" TargetType="GridView">
+        <Setter Property="IsItemClickEnabled" Value="True"/>
+        <Setter Property="SelectionMode" Value="None"/>
+        <Setter Property="Padding" Value="120,0,0,10"/>
+        <Setter Property="Margin" Value="-3,24,0,54"/>
+    </Style>
+
+    <Style x:Name="VerticalGridViewWithFilesStyle" TargetType="GridView">
+        <Setter Property="IsItemClickEnabled" Value="True"/>
+        <Setter Property="SelectionMode" Value="None"/>
+        <Setter Property="ScrollViewer.VerticalScrollMode" Value="Enabled"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="Padding" Value="120,0,0,10"/>
+        <Setter Property="Margin" Value="-3,24,0,54"/>
+    </Style>
+
+    <DataTemplate x:Key="GridViewWithDatFiles">
+        <Grid 
+            Width="310" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ContentControl
+                Margin="24,0,24,0"
+                VerticalAlignment="Center"
+                Holding="Center"
+                ContentTemplate="{StaticResource MailIconContentControl}"/>
+            <TextBlock
+                Style="{StaticResource GridViewTextBlockStyle}"
+                Text="{Binding DisplayName}"
+                Grid.Column="1"/>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="AnyVertical">
+        <Grid
+            Width="452" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="M 204,313.333L 260,313.333L 260,352L 204,352L 204,313.333 Z M 239.331,337.517C 239.331,337.517 241.129,337.754 241.128,336.243C 241.127,334.731 239.37,334.97 239.37,334.97L 223.732,334.972C 223.732,334.972 219.538,335.489 219.574,332.745C 219.614,330.002 223.732,330.517 223.732,330.517L 244.233,330.518C 244.233,330.518 249.26,330.282 249.261,334.655C 249.259,339.026 244.219,338.787 244.219,338.787L 221.184,338.787C 221.184,338.787 213.241,339.343 213.242,332.706C 213.243,326.069 221.185,326.707 221.185,326.707L 238.676,326.705C 238.676,326.705 240.473,326.861 240.476,325.432C 240.474,324 238.677,324.16 238.677,324.16L 218.609,324.16C 218.609,324.16 210.668,324.517 210.668,332.744C 210.667,340.974 218.611,341.333 218.611,341.333L 246.194,341.331C 246.194,341.331 251.997,341.056 251.998,334.655C 252,328.253 246.197,327.976 246.197,327.976L 222.465,327.974C 222.465,327.974 216.954,327.423 216.956,332.786C 216.954,338.152 222.465,337.513 222.465,337.513L 239.331,337.517 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="Any">
+        <Grid
+            Width="310" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="M 204,313.333L 260,313.333L 260,352L 204,352L 204,313.333 Z M 239.331,337.517C 239.331,337.517 241.129,337.754 241.128,336.243C 241.127,334.731 239.37,334.97 239.37,334.97L 223.732,334.972C 223.732,334.972 219.538,335.489 219.574,332.745C 219.614,330.002 223.732,330.517 223.732,330.517L 244.233,330.518C 244.233,330.518 249.26,330.282 249.261,334.655C 249.259,339.026 244.219,338.787 244.219,338.787L 221.184,338.787C 221.184,338.787 213.241,339.343 213.242,332.706C 213.243,326.069 221.185,326.707 221.185,326.707L 238.676,326.705C 238.676,326.705 240.473,326.861 240.476,325.432C 240.474,324 238.677,324.16 238.677,324.16L 218.609,324.16C 218.609,324.16 210.668,324.517 210.668,332.744C 210.667,340.974 218.611,341.333 218.611,341.333L 246.194,341.331C 246.194,341.331 251.997,341.056 251.998,334.655C 252,328.253 246.197,327.976 246.197,327.976L 222.465,327.974C 222.465,327.974 216.954,327.423 216.956,332.786C 216.954,338.152 222.465,337.513 222.465,337.513L 239.331,337.517 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="PictureVertical">
+        <Grid
+            Width="452" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="F1 M 358.66,173.138L 327.518,173.138L 341.58,153.626C 341.814,153.353 342.107,153.118 342.459,152.923C 342.811,152.728 343.23,152.63 343.719,152.63C 344.305,152.669 344.763,152.776 345.096,152.952L 345.74,153.362L 345.945,153.567L 359.539,170.94C 359.773,171.214 359.891,171.507 359.891,171.819C 359.891,172.035 359.842,172.259 359.744,172.493C 359.49,172.864 359.129,173.079 358.66,173.138 Z M 332.762,161.331L 324.207,173.138L 301.766,173.138L 301.15,172.948C 300.975,172.86 300.828,172.709 300.711,172.494C 300.633,172.338 300.594,172.133 300.594,171.878C 300.594,171.586 300.682,171.303 300.857,171.029L 317.264,148.06C 317.4,147.884 317.669,147.655 318.069,147.372C 318.469,147.089 319.021,146.947 319.725,146.947C 320.447,146.947 321.003,147.059 321.394,147.284C 321.785,147.508 322.078,147.738 322.273,147.972L 332.762,161.331 Z M 337.947,133.88L 337.947,139.212L 336.878,139.066L 335.75,139.007L 334.607,139.066L 333.553,139.212L 333.553,133.88C 333.553,133.314 333.753,132.831 334.153,132.43C 334.553,132.03 335.047,131.83 335.633,131.83C 335.926,131.83 336.209,131.884 336.482,131.991C 336.756,132.098 337.005,132.245 337.229,132.43C 337.454,132.616 337.629,132.831 337.757,133.075C 337.884,133.319 337.947,133.587 337.947,133.88 Z M 325.496,144.808L 321.687,141.292C 321.238,140.843 321.014,140.306 321.014,139.681C 321.014,139.115 321.209,138.636 321.6,138.245C 322.01,137.777 322.527,137.542 323.152,137.542C 323.699,137.542 324.207,137.728 324.676,138.099L 328.484,141.703L 327.62,142.362L 326.873,143.109L 326.141,143.929L 325.496,144.808 Z M 350.164,140.267L 346.56,144.134L 345.901,143.299L 345.154,142.552L 344.275,141.805L 343.396,141.175L 346.971,137.337C 347.42,136.888 347.947,136.663 348.553,136.663C 349.119,136.663 349.607,136.868 350.017,137.279C 350.252,137.494 350.428,137.738 350.545,138.011C 350.662,138.285 350.721,138.558 350.721,138.831C 350.721,139.359 350.535,139.837 350.164,140.267 Z M 349.051,148.939L 354.236,148.939C 354.822,148.939 355.325,149.163 355.745,149.612C 356.165,150.062 356.375,150.599 356.375,151.224C 356.375,151.81 356.165,152.322 355.745,152.762C 355.325,153.201 354.822,153.421 354.236,153.421L 349.051,153.421L 349.139,152.337L 349.168,151.195L 349.139,150.052L 349.051,148.939 Z M 339.793,142.845C 340.945,143.275 342,143.929 342.957,144.808C 343.777,145.589 344.426,146.453 344.905,147.401C 345.384,148.348 345.701,149.339 345.857,150.374L 344.891,150.11C 344.539,150.033 344.148,149.993 343.719,149.993C 342.898,149.993 342.132,150.15 341.419,150.462C 340.706,150.775 340.066,151.243 339.5,151.868L 339.441,151.927L 334.402,158.987L 326.932,149.466C 327.322,147.865 328.064,146.478 329.158,145.306C 330.135,144.271 331.238,143.494 332.469,142.977C 333.699,142.459 334.969,142.2 336.277,142.2C 337.468,142.2 338.64,142.415 339.793,142.845 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="Picture">
+        <Grid
+            Width="310" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="F1 M 358.66,173.138L 327.518,173.138L 341.58,153.626C 341.814,153.353 342.107,153.118 342.459,152.923C 342.811,152.728 343.23,152.63 343.719,152.63C 344.305,152.669 344.763,152.776 345.096,152.952L 345.74,153.362L 345.945,153.567L 359.539,170.94C 359.773,171.214 359.891,171.507 359.891,171.819C 359.891,172.035 359.842,172.259 359.744,172.493C 359.49,172.864 359.129,173.079 358.66,173.138 Z M 332.762,161.331L 324.207,173.138L 301.766,173.138L 301.15,172.948C 300.975,172.86 300.828,172.709 300.711,172.494C 300.633,172.338 300.594,172.133 300.594,171.878C 300.594,171.586 300.682,171.303 300.857,171.029L 317.264,148.06C 317.4,147.884 317.669,147.655 318.069,147.372C 318.469,147.089 319.021,146.947 319.725,146.947C 320.447,146.947 321.003,147.059 321.394,147.284C 321.785,147.508 322.078,147.738 322.273,147.972L 332.762,161.331 Z M 337.947,133.88L 337.947,139.212L 336.878,139.066L 335.75,139.007L 334.607,139.066L 333.553,139.212L 333.553,133.88C 333.553,133.314 333.753,132.831 334.153,132.43C 334.553,132.03 335.047,131.83 335.633,131.83C 335.926,131.83 336.209,131.884 336.482,131.991C 336.756,132.098 337.005,132.245 337.229,132.43C 337.454,132.616 337.629,132.831 337.757,133.075C 337.884,133.319 337.947,133.587 337.947,133.88 Z M 325.496,144.808L 321.687,141.292C 321.238,140.843 321.014,140.306 321.014,139.681C 321.014,139.115 321.209,138.636 321.6,138.245C 322.01,137.777 322.527,137.542 323.152,137.542C 323.699,137.542 324.207,137.728 324.676,138.099L 328.484,141.703L 327.62,142.362L 326.873,143.109L 326.141,143.929L 325.496,144.808 Z M 350.164,140.267L 346.56,144.134L 345.901,143.299L 345.154,142.552L 344.275,141.805L 343.396,141.175L 346.971,137.337C 347.42,136.888 347.947,136.663 348.553,136.663C 349.119,136.663 349.607,136.868 350.017,137.279C 350.252,137.494 350.428,137.738 350.545,138.011C 350.662,138.285 350.721,138.558 350.721,138.831C 350.721,139.359 350.535,139.837 350.164,140.267 Z M 349.051,148.939L 354.236,148.939C 354.822,148.939 355.325,149.163 355.745,149.612C 356.165,150.062 356.375,150.599 356.375,151.224C 356.375,151.81 356.165,152.322 355.745,152.762C 355.325,153.201 354.822,153.421 354.236,153.421L 349.051,153.421L 349.139,152.337L 349.168,151.195L 349.139,150.052L 349.051,148.939 Z M 339.793,142.845C 340.945,143.275 342,143.929 342.957,144.808C 343.777,145.589 344.426,146.453 344.905,147.401C 345.384,148.348 345.701,149.339 345.857,150.374L 344.891,150.11C 344.539,150.033 344.148,149.993 343.719,149.993C 342.898,149.993 342.132,150.15 341.419,150.462C 340.706,150.775 340.066,151.243 339.5,151.868L 339.441,151.927L 334.402,158.987L 326.932,149.466C 327.322,147.865 328.064,146.478 329.158,145.306C 330.135,144.271 331.238,143.494 332.469,142.977C 333.699,142.459 334.969,142.2 336.277,142.2C 337.468,142.2 338.64,142.415 339.793,142.845 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ArchiveVertical">
+        <Grid
+            Width="452" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="F1 M 204,226.667L 224,226.667L 224,237.333L 204,237.333L 204,226.667 Z M 260,226.667L 260,237.334L 240,237.334L 240,226.667L 260,226.667 Z M 204,213.334L 224,213.334L 224,224L 204,224L 204,213.334 Z M 260,213.334L 260,224L 240,224L 240,213.334L 260,213.334 Z M 204,200L 224,200L 224,210.667L 204,210.667L 204,200 Z M 260,200L 260,210.667L 240,210.667L 240,200L 260,200 Z M 226.667,200L 237.333,200L 237.333,237.333L 226.667,237.333L 226.667,200 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Archive">
+        <Grid
+            Width="310" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="F1 M 204,226.667L 224,226.667L 224,237.333L 204,237.333L 204,226.667 Z M 260,226.667L 260,237.334L 240,237.334L 240,226.667L 260,226.667 Z M 204,213.334L 224,213.334L 224,224L 204,224L 204,213.334 Z M 260,213.334L 260,224L 240,224L 240,213.334L 260,213.334 Z M 204,200L 224,200L 224,210.667L 204,210.667L 204,200 Z M 260,200L 260,210.667L 240,210.667L 240,200L 260,200 Z M 226.667,200L 237.333,200L 237.333,237.333L 226.667,237.333L 226.667,200 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="TextVertical">
+        <Grid
+            Width="452" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="M 204,260L 260,260L 260,298.667L 204,298.667L 204,260 Z M 214.667,269.334L 214.667,273.334L 249.333,273.334L 249.333,269.334L 214.667,269.334 Z M 214.667,277.334L 214.667,281.334L 249.333,281.334L 249.333,277.334L 214.667,277.334 Z M 214.667,285.333L 214.667,289.333L 249.333,289.333L 249.333,285.333L 214.667,285.333 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Text">
+        <Grid
+            Width="310" 
+            Height="90"
+            Background="#0090ff">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Path
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Margin="24,0,24,0"
+                Width="56"
+                Height="37"
+                Stretch="Uniform" 
+                Fill="White" 
+                Data="M 204,260L 260,260L 260,298.667L 204,298.667L 204,260 Z M 214.667,269.334L 214.667,273.334L 249.333,273.334L 249.333,269.334L 214.667,269.334 Z M 214.667,277.334L 214.667,281.334L 249.333,281.334L 249.333,277.334L 214.667,277.334 Z M 214.667,285.333L 214.667,289.333L 249.333,289.333L 249.333,285.333L 214.667,285.333 Z"/>
+            <Grid 
+                Grid.Column="1"
+                VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Style="{StaticResource GridViewTextBlockStyle}"
+                    Text="{Binding DisplayName}"/>
+                <TextBlock
+                    Style="{StaticResource GridViewFromTextBox}"
+                    Text="{Binding Size}" 
+                    Grid.Row="1"/>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+    
+    <Style x:Key="RoundedButton" TargetType="Button">
+        <Setter Property="FontSize" Value="30"/>
+        <Setter Property="Height" Value="48"/>
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Margin" Value="24,0,0,0"/>
+        <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="#0090ff"/>
+    </Style>
+    
+    <ControlTemplate x:Key="RoundButtonControlTemplate" TargetType="Button">
+        <Grid>
+            <FontIcon
+                Name="Icon" 
+                Glyph ="{TemplateBinding Content}"
+                Foreground="{TemplateBinding Foreground}" 
+                HorizontalAlignment="{TemplateBinding HorizontalAlignment}" 
+                VerticalAlignment="{TemplateBinding VerticalAlignment}" 
+                Canvas.ZIndex="1" 
+                FontSize="{TemplateBinding FontSize}"/>
+            <Ellipse
+                Name="Ellipse" 
+                StrokeThickness="2" 
+                Fill="{TemplateBinding Background}" 
+                Height="{TemplateBinding Height}" 
+                Width="{TemplateBinding Width}" 
+                Stroke="#FF33A7F7" 
+                Canvas.ZIndex="0"/>
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal"/>
+                    <VisualState x:Name="PointerOver">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Fill" 
+                                            Storyboard.TargetName="Ellipse">
+                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0" 
+                                                Value="#0090ff"/>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Foreground" 
+                                            Storyboard.TargetName="Icon">
+                                <DiscreteObjectKeyFrame 
+                                                KeyTime="0" 
+                                                Value="White"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                    <VisualState x:Name="Pressed">
+                        <Storyboard>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Fill" 
+                                            Storyboard.TargetName="Ellipse">
+                                <DiscreteObjectKeyFrame
+                                                KeyTime="0" 
+                                                Value="{x:Null}"/>
+                            </ObjectAnimationUsingKeyFrames>
+                            <ObjectAnimationUsingKeyFrames 
+                                            Storyboard.TargetProperty="Foreground" 
+                                            Storyboard.TargetName="Icon">
+                                <DiscreteObjectKeyFrame
+                                                KeyTime="0" 
+                                                Value="#0090ff"/>
+                            </ObjectAnimationUsingKeyFrames>
+                        </Storyboard>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateManager.VisualStateGroups>
+        </Grid>
+    </ControlTemplate>
+
+    <ItemsPanelTemplate x:Key="HorizontalStackPanel">
+        <StackPanel Orientation="Horizontal"/>
+    </ItemsPanelTemplate>
+
+    <ItemsPanelTemplate x:Key="VerticalStackPanel" >
+        <StackPanel Orientation="Vertical"/>
+    </ItemsPanelTemplate>
+
+    <ItemsPanelTemplate x:Key="HorizontalItemsWrapGrid" >
+        <ItemsWrapGrid Orientation="Horizontal"/>
+    </ItemsPanelTemplate>
+
+    <ItemsPanelTemplate x:Key="VerticalItemsWrapGrid" >
+        <ItemsWrapGrid Orientation="Vertical"/>
+    </ItemsPanelTemplate>
+
+    <Style x:Key="BackButton" TargetType="Button" BasedOn="{StaticResource NavigationBackButtonNormalStyle}">
+        <Setter Property="Margin" Value="39.5"/>
+        <Setter Property="Width" Value="41"/>
+        <Setter Property="Height" Value="41"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="#0090ff"/>       
+    </Style>
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="MinWidth" Value="17" />
+        <Setter Property="MinHeight" Value="17" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid x:Name="Root">
+                        <Grid.Resources>
+
+                            <!--************************RepeatButton***********************************************-->
+                            <ControlTemplate x:Key="RepeatButtonTemplate" TargetType="RepeatButton">
+                                <Border x:Name="Root" Background="{x:Null}"/>
+                            </ControlTemplate>
+                            <!--*************************************************************************************-->
+
+                            <!--************************Increment and decrement  RepeatButton***********************************************-->
+                            <!-- Visit Charmap for different arrow shapes-->
+                            <!--<ControlTemplate x:Key="HorizontalIncrementTemplate" TargetType="RepeatButton">
+                                <Grid x:Name="Root" Height="9" Width="9">
+                                    <TextBlock x:Name="BackgroundPressed" FontFamily="Segoe UI Symbol" Foreground="DarkGray" Text="&#x25B6;" FontSize="8" Opacity="1" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                                </Grid>
+                            </ControlTemplate>
+
+                            <ControlTemplate x:Key="HorizontalDecrementTemplate" TargetType="RepeatButton">
+                                <Grid x:Name="Root" Height="9" Width="9">
+                                    <TextBlock x:Name="BackgroundPointerOver" FontFamily="Segoe UI Symbol" Foreground="Gray" Text="&#x25C0;" FontSize="8" Opacity="1" HorizontalAlignment="Center"  VerticalAlignment="Center"></TextBlock>
+                                </Grid>
+                            </ControlTemplate>-->
+                            <!--******************************************************************************-->
+
+
+
+
+                            <!--************************thumb************************************************************-->
+                            <ControlTemplate x:Key="HorizontalThumbTemplate" TargetType="Thumb">
+                                <Border x:Name="Background" Background="#0090ff" />
+                            </ControlTemplate>
+                            <!--*********************************************************************************************-->
+                        </Grid.Resources>
+
+
+
+                        <!--here u can define height and width for scrollbar-->
+                        <Grid x:Name="HorizontalRoot" IsHitTestVisible="False" Height="5" Margin="0,-3,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle Grid.ColumnSpan="4" Margin="0" StrokeThickness="0.5" Fill="LightGray" Stroke="DarkGray" />
+                            <RepeatButton x:Name="HorizontalLargeDecrease" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" IsTabStop="False" Interval="80" Template="{StaticResource RepeatButtonTemplate}" />
+                            <Thumb x:Name="HorizontalThumb" Grid.Column="2" MinWidth="45" Height="15"  Template="{StaticResource HorizontalThumbTemplate}" Margin="0" />
+                            <RepeatButton x:Name="HorizontalLargeIncrease" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Stretch" IsTabStop="False" Interval="80" Template="{StaticResource RepeatButtonTemplate}"  />
+                        </Grid>
+                        <Grid x:Name="VerticalRoot" IsHitTestVisible="False" Width="5" Margin="0,-3,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Rectangle Grid.RowSpan="4" Margin="0" StrokeThickness="0.5" Fill="LightGray" Stroke="DarkGray" />
+                            <RepeatButton x:Name="VerticalLargeDecrease" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsTabStop="False" Interval="80" Template="{StaticResource RepeatButtonTemplate}" />
+                            <Thumb x:Name="VerticalThumb" Grid.Row="2" MinHeight="45" Width="15"  Template="{StaticResource HorizontalThumbTemplate}" Margin="0" />
+                            <RepeatButton x:Name="VerticalLargeIncrease" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsTabStop="False" Interval="80" Template="{StaticResource RepeatButtonTemplate}"  />
+                        </Grid>
+                        <Grid x:Name="HorizontalPanningRoot" HorizontalAlignment="Left" MinWidth="66">
+                            <Border x:Name="HorizontalPanningThumb" Background="Transparent"  MinWidth="15" />
+                        </Grid>
+                        <Grid x:Name="VerticalPanningRoot" VerticalAlignment="Top" MinHeight="66">
+                            <Border x:Name="VerticalPanningThumb" Background="Transparent"  MinHeight="15" />
+                        </Grid>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver" />
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="ScrollingIndicatorStates">
+                                <VisualState x:Name="TouchIndicator">
+                                    <Storyboard>
+                                        <FadeInThemeAnimation TargetName="HorizontalPanningRoot" />
+                                        <FadeOutThemeAnimation TargetName="HorizontalRoot" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalRoot" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+
+                                        <FadeInThemeAnimation TargetName="VerticalPanningRoot" />
+                                        <FadeOutThemeAnimation TargetName="VerticalRoot" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalRoot" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="MouseIndicator">
+                                    <Storyboard>
+                                        <FadeInThemeAnimation TargetName="HorizontalRoot" />
+                                        <FadeOutThemeAnimation TargetName="HorizontalPanningRoot" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="HorizontalPanningRoot" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible" Storyboard.TargetName="HorizontalRoot">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <x:Boolean>True</x:Boolean>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+
+                                        <FadeInThemeAnimation TargetName="VerticalRoot" />
+                                        <FadeOutThemeAnimation TargetName="VerticalPanningRoot" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="VerticalPanningRoot" Storyboard.TargetProperty="Visibility" Duration="0">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Collapsed</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible" Storyboard.TargetName="VerticalRoot">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <x:Boolean>True</x:Boolean>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="NoIndicator">
+                                    <Storyboard>
+                                        <FadeOutThemeAnimation BeginTime="0" TargetName="HorizontalPanningRoot" />
+                                        <FadeOutThemeAnimation BeginTime="0" TargetName="HorizontalRoot" />
+                                        <FadeOutThemeAnimation BeginTime="0" TargetName="VerticalPanningRoot" />
+                                        <FadeOutThemeAnimation BeginTime="0" TargetName="VerticalRoot" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <TextBlock x:Key="tb">
+        <TextBlock.Style>
+            <Style TargetType="TextBlock">
+                <i:Interaction.Behaviors>
+                    <tcore:EventTriggerBehavior EventName="IsMouseOver">
+                        <tcore:ChangePropertyAction PropertyName="TextBlock.Background" Value="red" />
+                    </tcore:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </Style>
+        </TextBlock.Style>
+    </TextBlock>
+</ResourceDictionary>

@@ -1,7 +1,5 @@
-﻿// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
-namespace DatMailReader
+﻿namespace DatMailReader
 {
-    using DatMailReader.Helpers.Common;
     using DatMailReader.Shared.Helpers;
     using DatMailReader.View;
     using DatMailReader.ViewModels.ViewModels;
@@ -44,8 +42,8 @@ namespace DatMailReader
             var navigationService = new NavigationService();
             navigationService.Configure(ViewModelLocatorPCL.ExtractedFilePageKey, typeof(ExtractedFilePage));
 #if WINDOWS_APP
-            navigationService.Configure(ViewModelLocatorPCL.AllDatFilesPage, typeof(AllRecentDatFiles));
-            navigationService.Configure(ViewModelLocatorPCL.AllAttachmentsPage, typeof(AllExtractedAttachments));
+            navigationService.Configure(ViewModelLocatorPCL.AllDatFilesPage, typeof(RecentDatFiles));
+            navigationService.Configure(ViewModelLocatorPCL.AllAttachmentsPage, typeof(ExtractedAttachments));
 #endif
             ViewModelLocatorPCL.NavigationService = navigationService;
 #if DEBUG

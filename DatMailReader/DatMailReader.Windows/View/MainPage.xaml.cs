@@ -2,6 +2,7 @@
 using DatMailReader.Shared.Services;
 using DatMailReader.ViewModels.ViewModels;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -28,25 +29,25 @@ namespace DatMailReader.View
 
         private string GetState(double width)
         {
-            //if (width <= 500)
-            //    return "Snapped";
+            if (width <= 500)
+                return "Snapped";
 
             //if (width <= 660)
             //    return "EvenSmaller";
 
-            if (width <= 755)
-                return "Smaller";
+            //if (width <= 755)
+            //    return "Smaller";
 
             return "Default";
         }
 
-        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             var fileService = FileSelectionService.Instance;
             fileService.Initialize();
             var viewModel = DataContext as MainViewModel;
-            viewModel.Initialize();
-            viewModel.fileOpenService = fileService;
+            await viewModel.Initialize();
+            viewModel.FileOpenService = fileService;
         }
     }
 }

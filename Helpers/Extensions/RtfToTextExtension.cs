@@ -21,8 +21,6 @@
             obj.SetValue(RichTextProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for RichText. This enables animation, styling, binding, etc...
-
         public static readonly DependencyProperty RichTextProperty =
         DependencyProperty.RegisterAttached("RichText", typeof(string), typeof(RtfTextExtension), new PropertyMetadata(string.Empty, Callback));
         private static void Callback(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -1,6 +1,6 @@
 ﻿namespace DatMailReader.Helpers.Providers
 {
-    using DatMailReader.Helpers.Common;
+    using DatMailReader.DataAccess.Common;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -11,10 +11,10 @@
     public class RecentFilesProvider
     {
         private const string MailDataFileName = "MailData";
+        private readonly static Lazy<RecentFilesProvider> instance = new Lazy<RecentFilesProvider>(() => new RecentFilesProvider(), true);
         private List<string> recentlyExtractedMailTokens = new List<string>();
         private List<StorageFile> recentlyExtractedStorageFiles = new List<StorageFile>();
-        private readonly static Lazy<RecentFilesProvider> instance = new Lazy<RecentFilesProvider>(() => new RecentFilesProvider(), true);
-        
+
         public static RecentFilesProvider Instance
         {
             get
@@ -39,7 +39,7 @@
             return result;
         }
 
-        public async void AddDatFileToken(StorageFile file)
+        public async Task AddDatFileToken(StorageFile file)
         {
             var uniqId = this.GetUniqIdForFile(file);
             StorageApplicationPermissions.FutureAccessList.AddOrReplace(uniqId, file);
@@ -49,6 +49,14 @@
                 await this.GetSingleStorageFileByToken(uniqId);
                 ObjectSerializer.Serialize(this.recentlyExtractedMailTokens, MailDataFileName);
             }
+        }
+
+        public void ClearRecentDatFilesCollection()
+        {
+            StorageApplicationPermissions.FutureAccessList.Clear();
+            this.recentlyExtractedMailTokens.Clear();
+            this.recentlyExtractedStorageFiles.Clear();
+            ObjectSerializer.Serialize(this.recentlyExtractedMailTokens, MailDataFileName);
         }
 
         private async Task<List<StorageFile>> GetFilesByToken()
@@ -95,7 +103,7 @@
         private string GetUniqIdForFile(StorageFile file)
         {
             var temp = file.FolderRelativeId.ToCharArray();
-            int index = 0;
+            var index = 0;
             for (int i = 0; i < temp.Length; i++)
             {
                 if (temp[i] == '\\')

@@ -4,6 +4,7 @@ namespace DatMailReader.View
 {
     using DatMailReader.Shared.Services;
     using DatMailReader.ViewModels.ViewModels;
+    using System.Threading.Tasks;
     using Windows.UI.Xaml.Controls;
 
     /// <summary>
@@ -18,13 +19,13 @@ namespace DatMailReader.View
             this.Loaded += OnLoaded;
         }
 
-        private void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        private async void OnLoaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             var fileService = FileSelectionService.Instance;
             fileService.Initialize();
             var viewModel = DataContext as MainViewModel;
-            viewModel.Initialize();
-            viewModel.fileOpenService = fileService;
+            await viewModel.Initialize();
+            viewModel.FileOpenService = fileService;
         }
     }
 }

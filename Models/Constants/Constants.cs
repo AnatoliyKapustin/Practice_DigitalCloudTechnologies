@@ -6,8 +6,8 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Tokens
+    public class Constants
     {
-        public const string fileToExtractToken = "FileToExtract";
+        public const string FileToExtractToken = "FileToExtractToken";
     }
 }
